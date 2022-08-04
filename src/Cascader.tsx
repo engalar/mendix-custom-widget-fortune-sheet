@@ -29,16 +29,20 @@ export default function Cascader(props: CascaderContainerProps) {
 
     useEffect(() => {
         store.mxOption = props;
-        return () => {
-        }
+        return () => {};
     }, [store, props]);
 
     useUnmount(() => {
         store.dispose();
     });
 
-    return <Observer>{() =>
-        <div className={props.class} style={parseStyle(props.style)}>
-            <CascaderComponent store={store} />
-        </div>}</Observer>;
+    return (
+        <Observer>
+            {() => (
+                <div className={props.class} style={parseStyle(props.style)}>
+                    <CascaderComponent store={store} />
+                </div>
+            )}
+        </Observer>
+    );
 }

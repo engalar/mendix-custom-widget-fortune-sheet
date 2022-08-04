@@ -25,8 +25,8 @@
     "test:e2e": "export URL=https://badge.mxapps.io || set URL=https://badge.mxapps.io && pluggable-widgets-tools test:e2e:ts",
     "test:e2e:dev": "export DEBUG=true || set DEBUG=true && pluggable-widgets-tools test:e2e:ts",
     "prerelease": "npm run lint",
-    "release": "node --max_old_space_size=8000 ./node_modules/.bin/pluggable-widgets-tools release:js",
-    "analyze": "node --max_old_space_size=8000 ./node_modules/.bin/pluggable-widgets-tools release:js --analyze",
+    "release": "pluggable-widgets-tools release:js",
+    "analyze": "pluggable-widgets-tools release:js --analyze",
     "generateTypings": "gulp generateTypings --gulpfile script/gulp.js",
     "openTestProject": "start tests/testProject/testProject.mpr",
     "backupTestProject": "cmd /c (if not exist dummy\\deployment\\data\\database\\hsqldb\\default (mkdir dummy\\deployment\\data\\database\\hsqldb\\default) else (echo skip 1)) && (if not exist dummy\\widgets (mkdir dummy\\widgets) else (echo skip 2)) && copy tests\\testProject\\testProject.mpr dummy\\ /Y && copy tests\\testProject\\deployment\\data\\database\\hsqldb\\default\\default.script dummy\\deployment\\data\\database\\hsqldb\\default\\",
@@ -68,6 +68,7 @@
     "big.js": "^5.2.2",
     "classnames": "^2.2.6",
     "mobx": "^6.3.10",
-    "mobx-react": "^7.2.1"
+    "mobx-react": "^7.2.1",
+    "core-js": "2.6.5"
   }
 }

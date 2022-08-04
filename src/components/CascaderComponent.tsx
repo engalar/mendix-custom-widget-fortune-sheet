@@ -11,7 +11,5 @@ const onChange = (value: any, selectedOptions: any) => {
 };
 
 export function CascaderComponent(props: CascaderComponentProps) {
-    return (
-        <C options={props.store.options} loadData={props.store.load} onChange={onChange} changeOnSelect />
-    );
+    return <C options={props.store.options} loadData={props.store.load} onChange={onChange} changeOnSelect />;
 }

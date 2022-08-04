@@ -4,13 +4,11 @@ export class BaseMxObject {
         this.sub = mx.data.subscribe({
             guid: guid,
             callback: guid => {
-                //@ts-ignore
-                this.onChange(guid);
+                this.onChange && this.onChange(guid);
             }
         });
     }
     get mxObject(): mendix.lib.MxObject | undefined {
-        //@ts-ignore
         return mx.data.getCachedObject(this.guid);
     }
     public dispose(): void {
@@ -19,5 +17,5 @@ export class BaseMxObject {
             this.sub = undefined;
         }
     }
-    onChange?: (guid: string) => void;
+    onChange?: (guid: number) => void;
 }
