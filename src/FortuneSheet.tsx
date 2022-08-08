@@ -1,6 +1,6 @@
 import { createElement, useEffect, useMemo } from "react";
 
-import { CascaderContainerProps } from "../typings/CascaderProps";
+import { ContainerProps } from "../typings/Props";
 
 import "./ui/index.scss";
 
@@ -24,7 +24,7 @@ const parseStyle = (style = ""): { [key: string]: string } => {
     }
 };
 
-export default function Cascader(props: CascaderContainerProps) {
+export default function (props: ContainerProps) {
     const store = useMemo(() => new Store(props), []);
 
     useEffect(() => {

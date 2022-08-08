@@ -1,6 +1,6 @@
 {
-  "name": "cascader",
-  "widgetName": "Cascader",
+  "name": "fortunesheet",
+  "widgetName": "FortuneSheet",
   "version": "1.0.2",
   "description": "Template repo for legacy custome wiget",
   "copyright": "2021 Mendix",

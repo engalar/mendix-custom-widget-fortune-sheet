@@ -23,9 +23,9 @@ interface _W {
     myString: string;
 }
 
-export interface CascaderContainerProps extends CommonProps, _W {}
+export interface ContainerProps extends CommonProps, _W {}
 
-export interface CascaderPreviewProps extends _W {
+export interface PreviewProps extends _W {
     class: string;
     style: string;
     styleObject: CSSProperties;

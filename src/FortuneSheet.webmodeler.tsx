@@ -1,9 +1,9 @@
 import { Component, ReactNode, createElement } from "react";
-import { CascaderContainerProps, CascaderPreviewProps } from "../typings/CascaderProps";
+import { ContainerProps, PreviewProps } from "../typings/Props";
 
 declare function require(name: string): string;
 
-export class preview extends Component<CascaderPreviewProps> {
+export class preview extends Component<PreviewProps> {
     render(): ReactNode {
         return <div>No preview available</div>;
     }
@@ -13,10 +13,10 @@ export function getPreviewCss(): string {
     return require("./ui/index.scss");
 }
 type VisibilityMap = {
-    [P in keyof CascaderContainerProps]: boolean;
+    [P in keyof ContainerProps]: boolean;
 };
 
-export function getVisibleProperties(props: CascaderContainerProps, visibilityMap: VisibilityMap): VisibilityMap {
+export function getVisibleProperties(props: ContainerProps, visibilityMap: VisibilityMap): VisibilityMap {
     // visibilityMap.nodeConstraint = props.nodeDataSource === "xpath";
     // visibilityMap.nodeGetDataMicroflow = props.nodeDataSource === "microflow";
     // visibilityMap.nodeGetDataNanoflow = props.nodeDataSource === "nanoflow";
