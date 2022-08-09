@@ -1,5 +1,5 @@
 import { createElement, useEffect, useMemo, useRef } from "react";
-import { Sheet, CellWithRowAndCol } from "@fortune-sheet/core";
+// import { Sheet, CellWithRowAndCol } from "@fortune-sheet/core";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
