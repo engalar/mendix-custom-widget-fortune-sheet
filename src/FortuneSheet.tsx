@@ -1,13 +1,14 @@
-import { createElement, useEffect, useMemo } from "react";
-
+import { createElement, useEffect, useMemo, useRef } from "react";
+import { Sheet, CellWithRowAndCol } from "@fortune-sheet/core";
+import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
 import { ContainerProps } from "../typings/Props";
-
 import "./ui/index.scss";
-
+import classNames from "classnames";
 import { Observer } from "mobx-react";
 import { Store } from "./store";
-import { CascaderComponent } from "./components/CascaderComponent";
 import { useUnmount } from "ahooks";
+import data from "./formula";
+
 
 const parseStyle = (style = ""): { [key: string]: string } => {
     try {
@@ -25,11 +26,12 @@ const parseStyle = (style = ""): { [key: string]: string } => {
 };
 
 export default function (props: ContainerProps) {
+    const ref = useRef<WorkbookInstance>(null);
     const store = useMemo(() => new Store(props), []);
 
     useEffect(() => {
         store.mxOption = props;
-        return () => {};
+        return () => { };
     }, [store, props]);
 
     useUnmount(() => {
@@ -39,8 +41,8 @@ export default function (props: ContainerProps) {
     return (
         <Observer>
             {() => (
-                <div className={props.class} style={parseStyle(props.style)}>
-                    <CascaderComponent store={store} />
+                <div className={classNames('mendixcn-fortune-sheet', props.class)} style={parseStyle(props.style)}>
+                    <Workbook ref={ref} showFormulaBar allowEdit showToolbar data={[data]} />
                 </div>
             )}
         </Observer>
