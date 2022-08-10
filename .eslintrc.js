@@ -9,5 +9,8 @@ module.exports = {
         "react/no-find-dom-node": "off",
         "react/no-deprecated": "warn",
         "no-undef": "warn",
+        "@typescript-eslint/camelcase": "off",
+        "@typescript-eslint/no-use-before-define": "off",
+        "react/display-name": "off"
     }
 };

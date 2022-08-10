@@ -7,46 +7,29 @@
     <icon></icon>
     <properties>
         <propertyGroup caption="通用">
+            <propertyGroup caption="通用">
+                <property key="horizental" type="attribute" required="false" isPath="no">
+                    <caption>是否水平</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Boolean" />
+                    </attributeTypes>
+                </property>
+            </propertyGroup>
             <propertyGroup caption="表头">
-                <!-- 
-{
-  "class": "mx-name-fortuneSheet1 ",
-  "style": "",
-  "tabindex": 0,
-  "title": "",
-  "index": "Index",
-  "headerEntity": "MyFirstModule.HeadConfig",
-  "index2": "Index",
-  "title2": "MyFirstModule.Helper_HeadConfig/MyFirstModule.HeadConfig/Title"
-}
-                 -->
                 <property key="headerEntity" type="entity" required="true" allowNonPersistableEntities="true">
                     <caption>表头数据实体</caption>
                     <description></description>
                 </property>
-                <property key="title" type="attribute" entityProperty="headerEntity" required="false" isPath="yes" pathType="reference">
+                <property key="title" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
                     <caption>标题</caption>
                     <description></description>
                     <attributeTypes>
                         <attributeType name="String" />
                     </attributeTypes>
                 </property>
-                <property key="title2" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
-                    <caption>标题2</caption>
-                    <description></description>
-                    <attributeTypes>
-                        <attributeType name="String" />
-                    </attributeTypes>
-                </property>
-                <property key="index2" type="attribute" entityProperty="headerEntity" required="false" isPath="no">
-                    <caption>索引2</caption>
-                    <description></description>
-                    <attributeTypes>
-                        <attributeType name="Integer" />
-                    </attributeTypes>
-                </property>
-                <property key="index" type="attribute" entityProperty="headerEntity" required="false">
-                    <caption>索引1</caption>
+                <property key="index" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>索引</caption>
                     <description></description>
                     <attributeTypes>
                         <attributeType name="Integer" />

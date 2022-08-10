@@ -1,5 +1,4 @@
-import { CascaderOptionType } from "antd/lib/cascader";
-import { configure, flow, makeObservable, observable, when } from "mobx";
+import { configure, makeObservable, observable, when } from "mobx";
 import { ContainerProps } from "../../typings/Props";
 
 configure({ enforceActions: "observed", isolateGlobalState: true, useProxies: "never" });
@@ -12,21 +11,26 @@ export class Store {
     public dispose() {}
 
     constructor(public mxOption: ContainerProps) {
-        makeObservable(this, { options: observable, load: flow.bound });
+        makeObservable(this, { mxOption: observable });
 
         when(
             () => !!this.mxOption.mxObject,
             () => {
+                debugger;
                 this.update();
 
                 this.sub = mx.data.subscribe(
                     {
                         guid: this.mxOption.mxObject!.getGuid(),
-                        callback: () => {
+                        attr: "Horizontal",
+                        callback: (guid, attr, value) => {
+                            debugger;
+                            console.log(guid, attr, value);
+
                             this.update();
                             //等待视图刷新
                             setTimeout(() => {
-                                this.drawSelection();
+                                console.log("wait for");
                             }, 1);
                         }
                     },
@@ -42,48 +46,6 @@ export class Store {
         );
     }
     update() {
-        throw new Error("Method not implemented.");
-    }
-    drawSelection() {
-        throw new Error("Method not implemented.");
-    }
-
-    public options: CascaderOptionType[] | undefined = [
-        {
-            value: "zhejiang",
-            label: "Zhejiang",
-            isLeaf: false
-        },
-        {
-            value: "jiangsu",
-            label: "Jiangsu",
-            isLeaf: false
-        }
-    ];
-
-    *load(selectedOptions?: CascaderOptionType[]) {
-        if (!selectedOptions) {
-            return;
-        }
-        const targetOption = selectedOptions[selectedOptions.length - 1];
-        targetOption.loading = true;
-
-        targetOption.children = yield new Promise<CascaderOptionType[]>((resolve, _reject) => {
-            setTimeout(() => {
-                resolve([
-                    {
-                        label: `${targetOption.label} Dynamic 1`,
-                        value: "dynamic1"
-                    },
-                    {
-                        label: `${targetOption.label} Dynamic 2`,
-                        value: "dynamic2"
-                    }
-                ]);
-            }, 1000);
-        });
-
-        targetOption.loading = false;
-        this.options = [...this.options!];
+        console.log("do some update");
     }
 }

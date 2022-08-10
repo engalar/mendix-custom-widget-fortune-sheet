@@ -1,3 +1,4 @@
+//@ts-ignore:@typescript-eslint/camelcase
 import { Sheet } from "@fortune-sheet/core";
 const data: Sheet = {
     name: "Formula",
@@ -88,10 +89,8 @@ const data: Sheet = {
     order: 1,
     column: 18,
     row: 45,
-    celldata: [
-    ],
-    calcChain: [
-    ],
+    celldata: [],
+    calcChain: [],
     luckysheet_select_save: [
         {
             left: 532,

@@ -4,7 +4,8 @@
     "module": "es6",
     "types": [
       "mendix-client",
-      "jest"
+      "jest",
+      "custom"
     ],
     "typeRoots": [
       "./typings",
