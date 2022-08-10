@@ -14,7 +14,7 @@
   "packagePath": "com.mendix.widget.custom",
   "scripts": {
     "testProject": "git clone https://gitee.com/engalar/mendix-testproject-960.git --depth=1 ./tests/testProject && rimraf  tests/testProject/.git",
-    "start": "cross-env NODE_OPTIONS=--max_old_space_size=4096 concurrently \"pluggable-widgets-tools start:server --open\" \"npm:dev\"",
+    "start": "cross-env NODE_OPTIONS=--max_old_space_size=8192 concurrently \"pluggable-widgets-tools start:server --open\" \"npm:dev\"",
     "dev": "pluggable-widgets-tools start:js",
     "build": "pluggable-widgets-tools build:js",
     "lint": "pluggable-widgets-tools lint",
