@@ -1,13 +1,12 @@
 import { createElement, useEffect, useMemo, useRef } from "react";
-// import { Sheet, CellWithRowAndCol } from "@fortune-sheet/core";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
 import classNames from "classnames";
-import { Observer } from "mobx-react";
 import { Store } from "./store";
-import { useUnmount } from "ahooks";
-import data from "./formula";
+import { useMount, useUnmount } from "ahooks";
+import data from "./data/empty";
+import { Workbook as wb } from "exceljs";
 
 
 const parseStyle = (style = ""): { [key: string]: string } => {
@@ -38,13 +37,20 @@ export default function (props: ContainerProps) {
         store.dispose();
     });
 
-    return (
-        <Observer>
-            {() => (
-                <div className={classNames('mendixcn-fortune-sheet', props.class)} style={parseStyle(props.style)}>
-                    <Workbook ref={ref} showFormulaBar allowEdit showToolbar data={[data]} />
-                </div>
-            )}
-        </Observer>
+    useMount(async () => {
+        const res = await fetch('demo.xlsx');
+        const data = await res.arrayBuffer();
+        const wbInstance = await new wb().xlsx.load(data);
+
+        wbInstance.worksheets[0].eachRow(row => {
+            row.eachCell(cell => {
+                ref.current?.setCellValue(Number(cell.row) - 1, Number(cell.col) - 1, cell.value, { type: cell.formula ? 'f' : 'v' })
+            });
+        });
+    })
+
+    return (<div className={classNames('mendixcn-fortune-sheet', props.class)} style={parseStyle(props.style)}>
+        <Workbook ref={ref} showFormulaBar allowEdit showToolbar data={[data]} />
+    </div>
     );
 }
