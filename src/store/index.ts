@@ -16,7 +16,6 @@ export class Store {
         when(
             () => !!this.mxOption.mxObject,
             () => {
-                debugger;
                 this.update();
 
                 this.sub = mx.data.subscribe(
@@ -24,9 +23,7 @@ export class Store {
                         guid: this.mxOption.mxObject!.getGuid(),
                         attr: "Horizontal",
                         callback: (guid, attr, value) => {
-                            debugger;
                             console.log(guid, attr, value);
-
                             this.update();
                             //等待视图刷新
                             setTimeout(() => {
