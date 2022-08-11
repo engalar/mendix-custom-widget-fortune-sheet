@@ -4,17 +4,27 @@ import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
 import classNames from "classnames";
 import { Store } from "./store";
-import { useMount, useUnmount } from "ahooks";
+import { useMount, useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks";
 import data from "./data/empty";
 import { ValueType, Workbook as wb } from "exceljs";
 
-export default function(props: ContainerProps) {
+export default function (props: ContainerProps) {
     const ref = useRef<WorkbookInstance>(null);
+    const refContainer = useRef(null);
+    const [inViewport] = useInViewport(refContainer);
+    const preInViewPort = usePrevious(inViewport);
+    useUpdateEffect(() => {
+        if (inViewport && !preInViewPort) {
+            //trick redraw
+            window.dispatchEvent(new Event('resize'));
+        }
+    }, [inViewport])
+
     const store = useMemo(() => new Store(props), []);
 
     useEffect(() => {
         store.mxOption = props;
-        return () => {};
+        return () => { };
     }, [store, props]);
 
     useUnmount(() => {
@@ -26,7 +36,7 @@ export default function(props: ContainerProps) {
     });
 
     return (
-        <div className={classNames("mendixcn-fortune-sheet", props.class)} style={parseStyle(props.style)}>
+        <div ref={refContainer} className={classNames("mendixcn-fortune-sheet", props.class)} style={parseStyle(props.style)}>
             <Workbook ref={ref} showFormulaBar={!props.readOnly} allowEdit={!props.readOnly} showToolbar={!props.readOnly} data={[data]} />
         </div>
     );
