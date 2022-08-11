@@ -7,6 +7,7 @@ import { Store } from "./store";
 import { useMount, useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks";
 import data from "./data/empty";
 import { ValueType, Workbook as wb } from "exceljs";
+import { autorun } from "mobx";
 
 export default function (props: ContainerProps) {
     const ref = useRef<WorkbookInstance>(null);
@@ -35,9 +36,17 @@ export default function (props: ContainerProps) {
         await loadExcelTemplate(ref, "demo.xlsx");
     });
 
+    autorun(() => {
+        store.cellValues.forEach(cell => {
+            ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
+                type: cell.ValueType === 3 ? "v" : "f"
+            });
+        })
+    })
+
     return (
         <div ref={refContainer} className={classNames("mendixcn-fortune-sheet", props.class)} style={parseStyle(props.style)}>
-            <Workbook ref={ref} showFormulaBar={!props.readOnly} allowEdit={!props.readOnly} showToolbar={!props.readOnly} data={[data]} />
+            <Workbook ref={ref} showFormulaBar={!props.readOnly} allowEdit={true} showToolbar={!props.readOnly} data={[data]} />
         </div>
     );
 }
