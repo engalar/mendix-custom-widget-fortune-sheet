@@ -33,7 +33,7 @@ export default function (props: ContainerProps) {
     });
 
     useMount(async () => {
-        await loadExcelTemplate(ref, "demo.xlsx");
+        await loadExcelTemplate(ref, props.tplAddress);
     });
 
     autorun(() => {
