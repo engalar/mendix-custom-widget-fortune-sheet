@@ -1,7 +1,7 @@
 {
-  "name": "cascader",
-  "widgetName": "Cascader",
-  "version": "1.0.1",
+  "name": "fortunesheet",
+  "widgetName": "FortuneSheet",
+  "version": "1.0.3",
   "description": "Template repo for legacy custome wiget",
   "copyright": "2021 Mendix",
   "author": "Liu Wengao <wengao.liu@siemens.com>",
@@ -14,7 +14,7 @@
   "packagePath": "com.mendix.widget.custom",
   "scripts": {
     "testProject": "git clone https://gitee.com/engalar/mendix-testproject-960.git --depth=1 ./tests/testProject && rimraf  tests/testProject/.git",
-    "start": "cross-env NODE_OPTIONS=--max_old_space_size=4096 concurrently \"pluggable-widgets-tools start:server --open\" \"npm:dev\"",
+    "start": "pluggable-widgets-tools start:server --open",
     "dev": "pluggable-widgets-tools start:js",
     "build": "pluggable-widgets-tools build:js",
     "lint": "pluggable-widgets-tools lint",
@@ -30,17 +30,16 @@
     "generateTypings": "gulp generateTypings --gulpfile script/gulp.js",
     "openTestProject": "start tests/testProject/testProject.mpr",
     "backupTestProject": "cmd /c (if not exist dummy\\deployment\\data\\database\\hsqldb\\default (mkdir dummy\\deployment\\data\\database\\hsqldb\\default) else (echo skip 1)) && (if not exist dummy\\widgets (mkdir dummy\\widgets) else (echo skip 2)) && copy tests\\testProject\\testProject.mpr dummy\\ /Y && copy tests\\testProject\\deployment\\data\\database\\hsqldb\\default\\default.script dummy\\deployment\\data\\database\\hsqldb\\default\\",
-    "postbackupTestProject": "cmd /c copy tests\\testProject\\widgets\\com.mendix.widget.custom.Cascader.mpk dummy\\widgets\\",
     "restoreTestProject": "cmd /c xcopy dummy tests\\testProject /E /Y"
   },
   "license": "Apache-2.0",
   "devDependencies": {
     "@engalar/mendix-client": "^8.0.0",
-    "@mendix/pluggable-widgets-tools": "8.6.0",
+    "@mendix/pluggable-widgets-tools": "8.7.2",
     "@types/big.js": "^4.0.5",
     "@types/classnames": "^2.2.4",
     "@types/debounce": "^1.2.0",
-    "@types/dojo": "^1.9.34",
+    "@types/dojo": "^1.9.43",
     "@types/enzyme": "^3.1.10",
     "@types/enzyme-adapter-react-16": "^1.0.2",
     "@types/jasmine": "^3.4.0",
@@ -61,9 +60,11 @@
     "webpack-bundle-analyzer": "^3.6.0"
   },
   "dependencies": {
-    "ahooks": "^2.10.14",
+    "@fortune-sheet/react": "^0.5.8",
+    "ahooks": "^3.7.0",
     "@bem-react/classname": "^1.5.6",
     "@jeltemx/mendix-react-widget-utils": "^0.9.0",
+    "exceljs": "^4.3.0",
     "antd": "^4.15.5",
     "big.js": "^5.2.2",
     "classnames": "^2.2.6",

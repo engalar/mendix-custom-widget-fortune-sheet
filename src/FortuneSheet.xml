@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<widget id="com.mendix.widget.custom.fortunesheet.FortuneSheet" needsEntityContext="true" offlineCapable="true" supportedPlatform="Web"
+    xmlns="http://www.mendix.com/widget/1.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd">
+    <name>FortuneSheet</name>
+    <description>FortuneSheet for Mendix</description>
+    <icon></icon>
+    <properties>
+        <propertyGroup caption="通用">
+            <propertyGroup caption="模板文件">
+                <property key="tplAddress" type="string" required="true" defaultValue="" multiline="false">
+                    <caption>地址</caption>
+                    <description></description>
+                </property>
+            </propertyGroup>
+            <propertyGroup caption="单元格">
+                <property key="cellEntity" type="entity" required="true" allowNonPersistableEntities="true">
+                    <caption>数据实体</caption>
+                    <description></description>
+                </property>
+                <property key="rowIndex" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>行索引</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="colIndex" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>列索引</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="valueType" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>值类型</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="value" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>值</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="String" />
+                    </attributeTypes>
+                </property>
+            </propertyGroup>
+            <propertyGroup caption="合并单元格">
+                <property key="mergeEntity" type="entity" required="false" allowNonPersistableEntities="true">
+                    <caption>数据实体</caption>
+                    <description></description>
+                </property>
+                <property key="top" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>上</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="bottom" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>下</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="left" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>左</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="right" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>右</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+            </propertyGroup>
+        </propertyGroup>
+    </properties>
+</widget>

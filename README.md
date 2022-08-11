@@ -1,3 +1,5 @@
+![demo](img/demo.png)
+
 # 重命名
 
 [参考](https://github.com/engalar/mendix-custom-widget-radar/commit/07fd0dfb69b781c0b31cdb5502678304c954383c)

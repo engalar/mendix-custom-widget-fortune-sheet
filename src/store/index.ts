@@ -1,18 +1,26 @@
-import { CascaderOptionType } from "antd/lib/cascader";
-import { configure, flow, makeObservable, observable, when } from "mobx";
-import { CascaderContainerProps } from "../../typings/CascaderProps";
+import { configure, makeObservable, observable, when } from "mobx";
+import { ContainerProps } from "../../typings/Props";
+import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 
 configure({ enforceActions: "observed", isolateGlobalState: true, useProxies: "never" });
 
+interface CellValue {
+    RowIdx: number;
+    ColIdx: number;
+    ValueType: number;
+    Value: string;
+}
+
 export class Store {
+    cellValues: CellValue[] = [];
     sub?: mx.Subscription;
     /**
      * dispose
      */
     public dispose() {}
 
-    constructor(public mxOption: CascaderContainerProps) {
-        makeObservable(this, { options: observable, load: flow.bound });
+    constructor(public mxOption: ContainerProps) {
+        makeObservable(this, { mxOption: observable, cellValues: observable });
 
         when(
             () => !!this.mxOption.mxObject,
@@ -22,11 +30,12 @@ export class Store {
                 this.sub = mx.data.subscribe(
                     {
                         guid: this.mxOption.mxObject!.getGuid(),
-                        callback: () => {
-                            this.update();
+                        attr: "Horizontal",
+                        callback: (guid, attr, value) => {
+                            console.log(guid, attr, value);
                             //等待视图刷新
                             setTimeout(() => {
-                                this.drawSelection();
+                                console.log("wait for");
                             }, 1);
                         }
                     },
@@ -41,49 +50,29 @@ export class Store {
             }
         );
     }
-    update() {
-        throw new Error("Method not implemented.");
-    }
-    drawSelection() {
-        throw new Error("Method not implemented.");
-    }
-
-    public options: CascaderOptionType[] | undefined = [
-        {
-            value: "zhejiang",
-            label: "Zhejiang",
-            isLeaf: false
-        },
-        {
-            value: "jiangsu",
-            label: "Jiangsu",
-            isLeaf: false
+    async update() {
+        if (this.mxOption.mxObject) {
+            const objs = await fetchEntitysOverPath<mendix.lib.MxObject[]>(
+                this.mxOption.mxObject,
+                getReferencePart(this.mxOption.rowIndex, "referenceAttr") +
+                    "/" +
+                    getReferencePart(this.mxOption.rowIndex, "entity")
+            );
+            const that = this;
+            that.cellValues = objs.map<CellValue>(obj => ({
+                RowIdx: Number(obj.get(that.mxOption.rowIndex.split("/").slice(-1)[0])),
+                ColIdx: Number(obj.get(that.mxOption.colIndex.split("/").slice(-1)[0])),
+                Value: obj.get(that.mxOption.value.split("/").slice(-1)[0]) as string,
+                ValueType: Number(obj.get(that.mxOption.valueType.split("/").slice(-1)[0]))
+            }));
         }
-    ];
+    }
+}
 
-    *load(selectedOptions?: CascaderOptionType[]) {
-        if (!selectedOptions) {
-            return;
-        }
-        const targetOption = selectedOptions[selectedOptions.length - 1];
-        targetOption.loading = true;
-
-        targetOption.children = yield new Promise<CascaderOptionType[]>((resolve, _reject) => {
-            setTimeout(() => {
-                resolve([
-                    {
-                        label: `${targetOption.label} Dynamic 1`,
-                        value: "dynamic1"
-                    },
-                    {
-                        label: `${targetOption.label} Dynamic 2`,
-                        value: "dynamic2"
-                    }
-                ]);
-            }, 1000);
+async function fetchEntitysOverPath<T>(obj: mendix.lib.MxObject, path: string) {
+    return new Promise<T>((resolve, _reject) => {
+        obj.fetch(path, objs => {
+            resolve(objs);
         });
-
-        targetOption.loading = false;
-        this.options = [...this.options!];
-    }
+    });
 }
