@@ -7,29 +7,68 @@
     <icon></icon>
     <properties>
         <propertyGroup caption="通用">
-            <propertyGroup caption="通用">
-                <property key="horizental" type="attribute" required="false" isPath="no">
-                    <caption>是否水平</caption>
+            <propertyGroup caption="单元格">
+                <property key="cellEntity" type="entity" required="true" allowNonPersistableEntities="true">
+                    <caption>数据实体</caption>
+                    <description></description>
+                </property>
+                <property key="rowIndex" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>行索引</caption>
                     <description></description>
                     <attributeTypes>
-                        <attributeType name="Boolean" />
+                        <attributeType name="Integer" />
                     </attributeTypes>
                 </property>
-            </propertyGroup>
-            <propertyGroup caption="表头">
-                <property key="headerEntity" type="entity" required="true" allowNonPersistableEntities="true">
-                    <caption>表头数据实体</caption>
+                <property key="colIndex" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>列索引</caption>
                     <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
                 </property>
-                <property key="title" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
-                    <caption>标题</caption>
+                <property key="valueType" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>值类型</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="value" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>值</caption>
                     <description></description>
                     <attributeTypes>
                         <attributeType name="String" />
                     </attributeTypes>
                 </property>
-                <property key="index" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
-                    <caption>索引</caption>
+            </propertyGroup>
+            <propertyGroup caption="合并单元格">
+                <property key="mergeEntity" type="entity" required="false" allowNonPersistableEntities="true">
+                    <caption>数据实体</caption>
+                    <description></description>
+                </property>
+                <property key="top" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>上</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="bottom" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>下</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="left" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>左</caption>
+                    <description></description>
+                    <attributeTypes>
+                        <attributeType name="Integer" />
+                    </attributeTypes>
+                </property>
+                <property key="right" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                    <caption>右</caption>
                     <description></description>
                     <attributeTypes>
                         <attributeType name="Integer" />

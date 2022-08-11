@@ -27,7 +27,7 @@ export default function(props: ContainerProps) {
 
     return (
         <div className={classNames("mendixcn-fortune-sheet", props.class)} style={parseStyle(props.style)}>
-            <Workbook ref={ref} showFormulaBar allowEdit showToolbar data={[data]} />
+            <Workbook ref={ref} showFormulaBar={!props.readOnly} allowEdit={!props.readOnly} showToolbar={!props.readOnly} data={[data]} />
         </div>
     );
 }

@@ -20,7 +20,16 @@ interface CommonProps {
 }
 
 interface _W {
-    myString: string;
+    top: string;
+    bottom: string;
+    left: string;
+    right: string;
+    cellEntity: string;
+    colIndex: string;
+    rowIndex: string;
+    mergeEntity: string;
+    value: string;
+    valueType: string;
 }
 
 export interface ContainerProps extends CommonProps, _W {}
