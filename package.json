@@ -1,7 +1,7 @@
 {
   "name": "fortunesheet",
   "widgetName": "FortuneSheet",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Template repo for legacy custome wiget",
   "copyright": "2021 Mendix",
   "author": "Liu Wengao <wengao.liu@siemens.com>",
@@ -14,7 +14,7 @@
   "packagePath": "com.mendix.widget.custom",
   "scripts": {
     "testProject": "git clone https://gitee.com/engalar/mendix-testproject-960.git --depth=1 ./tests/testProject && rimraf  tests/testProject/.git",
-    "start": "cross-env NODE_OPTIONS=--max_old_space_size=8192 concurrently \"pluggable-widgets-tools start:server --open\" \"npm:dev\"",
+    "start": "pluggable-widgets-tools start:server --open",
     "dev": "pluggable-widgets-tools start:js",
     "build": "pluggable-widgets-tools build:js",
     "lint": "pluggable-widgets-tools lint",

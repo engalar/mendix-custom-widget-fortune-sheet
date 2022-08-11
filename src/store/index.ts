@@ -51,11 +51,6 @@ export class Store {
         );
     }
     async update() {
-        console.log(
-            "do some update",
-            getReferencePart(this.mxOption.rowIndex, "entity"),
-            getReferencePart(this.mxOption.rowIndex, "referenceAttr")
-        );
         if (this.mxOption.mxObject) {
             const objs = await fetchEntitysOverPath<mendix.lib.MxObject[]>(
                 this.mxOption.mxObject,
