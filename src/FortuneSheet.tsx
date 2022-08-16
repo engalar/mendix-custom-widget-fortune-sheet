@@ -7,9 +7,9 @@ import { Store } from "./store";
 import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks";
 import data from "./data/empty";
 import { autorun } from "mobx";
-import { loadExcelTemplate } from './store/util'
+import { loadExcelTemplate } from "./store/util";
 
-export default function (props: ContainerProps) {
+export default function(props: ContainerProps) {
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
     const [inViewport] = useInViewport(refContainer);
@@ -25,7 +25,7 @@ export default function (props: ContainerProps) {
 
     useEffect(() => {
         store.mxOption = props;
-        return () => { };
+        return () => {};
     }, [store, props]);
 
     useUnmount(() => {
@@ -50,7 +50,7 @@ export default function (props: ContainerProps) {
         return () => {
             disp1();
             disp2();
-        }
+        };
     }, []);
 
     return (
