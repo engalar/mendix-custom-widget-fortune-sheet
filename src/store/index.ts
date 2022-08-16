@@ -14,7 +14,8 @@ interface CellValue {
 
 export class Store {
     cellValues: CellValue[] = [];
-    tplObj?: mendix.lib.MxObject;
+    tplObjGuid?: string;
+    tplUrl?: string;
     sub?: mx.Subscription;
     /**
      * dispose
@@ -22,7 +23,12 @@ export class Store {
     public dispose() {}
 
     constructor(public mxOption: ContainerProps) {
-        makeObservable(this, { mxOption: observable, cellValues: observable, tplObj: observable });
+        makeObservable(this, {
+            mxOption: observable,
+            cellValues: observable,
+            tplObjGuid: observable,
+            tplUrl: observable
+        });
 
         when(
             () => !!this.mxOption.mxObject,
@@ -72,7 +78,10 @@ export class Store {
     }
     async update() {
         const tplObj = await this.checkAndGetFileDocumentOb();
-        if (tplObj) this.tplObj = tplObj;
+        if (tplObj) {
+            this.tplObjGuid = tplObj.getGuid();
+            this.tplUrl = mx.data.getDocumentUrl(tplObj.getGuid(), tplObj.get("changedDate") as number);
+        }
 
         if (this.mxOption.mxObject) {
             const objs = await fetchEntitysOverPath<mendix.lib.MxObject[]>(

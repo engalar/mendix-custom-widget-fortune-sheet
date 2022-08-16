@@ -32,20 +32,26 @@ export default function (props: ContainerProps) {
         store.dispose();
     });
 
-    autorun(async () => {
-        store.cellValues.forEach(cell => {
-            ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
-                type: cell.ValueType === 3 ? "v" : "f"
+    useEffect(() => {
+        const disp1 = autorun(async () => {
+            store.cellValues.forEach(cell => {
+                ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
+                    type: cell.ValueType === 3 ? "v" : "f"
+                });
             });
         });
-    });
 
-    autorun(async () => {
-        if (store.tplObj) {
-            const tplUrl = mx.data.getDocumentUrl(store.tplObj.getGuid(), store.tplObj.get("changedDate") as number)
-            await loadExcelTemplate(ref, tplUrl);
+        const disp2 = autorun(async () => {
+            if (store.tplUrl) {
+                await loadExcelTemplate(ref, store.tplUrl);
+            }
+        });
+
+        return () => {
+            disp1();
+            disp2();
         }
-    });
+    }, []);
 
     return (
         <div
