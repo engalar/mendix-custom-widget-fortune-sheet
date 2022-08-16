@@ -20,7 +20,7 @@ interface CommonProps {
 }
 
 interface _W {
-    tplAddress: string;
+    tplFile: string;
     top: string;
     bottom: string;
     left: string;

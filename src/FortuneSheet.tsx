@@ -1,15 +1,15 @@
-import { createElement, RefObject, useEffect, useMemo, useRef } from "react";
+import { createElement, useEffect, useMemo, useRef } from "react";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
 import classNames from "classnames";
 import { Store } from "./store";
-import { useMount, useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks";
+import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks";
 import data from "./data/empty";
-import { ValueType, Workbook as wb } from "exceljs";
 import { autorun } from "mobx";
+import { loadExcelTemplate } from './store/util'
 
-export default function(props: ContainerProps) {
+export default function (props: ContainerProps) {
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
     const [inViewport] = useInViewport(refContainer);
@@ -25,23 +25,26 @@ export default function(props: ContainerProps) {
 
     useEffect(() => {
         store.mxOption = props;
-        return () => {};
+        return () => { };
     }, [store, props]);
 
     useUnmount(() => {
         store.dispose();
     });
 
-    useMount(async () => {
-        await loadExcelTemplate(ref, props.tplAddress);
-    });
-
-    autorun(() => {
+    autorun(async () => {
         store.cellValues.forEach(cell => {
             ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
                 type: cell.ValueType === 3 ? "v" : "f"
             });
         });
+    });
+
+    autorun(async () => {
+        if (store.tplObj) {
+            const tplUrl = mx.data.getDocumentUrl(store.tplObj.getGuid(), store.tplObj.get("changedDate") as number)
+            await loadExcelTemplate(ref, tplUrl);
+        }
     });
 
     return (
@@ -59,33 +62,6 @@ export default function(props: ContainerProps) {
             />
         </div>
     );
-}
-async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: string) {
-    const res = await fetch(url);
-    const data = await res.arrayBuffer();
-    const wbInstance = await new wb().xlsx.load(data);
-
-    wbInstance.worksheets[0].eachRow(row => {
-        row.eachCell(cell => {
-            if (cell.type !== ValueType.Merge) {
-                ref.current?.setCellValue(Number(cell.row) - 1, Number(cell.col) - 1, cell.value, {
-                    type: cell.formula ? "f" : "v"
-                });
-                if (cell.isMerged) {
-                    //@ts-ignore:next-line
-                    const range = wbInstance.worksheets[0]._merges[cell.address].model;
-                    // wbInstance.worksheets[0].mergeCells(range.top, range.left, range.bottom, range.right);
-                    //https://github.com/ruilisi/fortune-sheet/blob/76a66b9c0ba5125397313494db0798f560d70fbf/packages/core/test/api/merge.test.js
-                    ref.current?.mergeCells(
-                        [{ column: [range.left - 1, range.right - 1], row: [range.top - 1, range.bottom - 1] }],
-                        "merge-all"
-                    );
-                }
-            } else {
-                //https://github.com/exceljs/exceljs#merged-cells
-            }
-        });
-    });
 }
 
 const parseStyle = (style = ""): { [key: string]: string } => {

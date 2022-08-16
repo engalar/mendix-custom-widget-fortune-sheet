@@ -1,6 +1,7 @@
 import { configure, makeObservable, observable, when } from "mobx";
 import { ContainerProps } from "../../typings/Props";
 import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
+import { fetchEntityOverPath } from "./util";
 
 configure({ enforceActions: "observed", isolateGlobalState: true, useProxies: "never" });
 
@@ -13,6 +14,7 @@ interface CellValue {
 
 export class Store {
     cellValues: CellValue[] = [];
+    tplObj?: mendix.lib.MxObject;
     sub?: mx.Subscription;
     /**
      * dispose
@@ -20,7 +22,7 @@ export class Store {
     public dispose() {}
 
     constructor(public mxOption: ContainerProps) {
-        makeObservable(this, { mxOption: observable, cellValues: observable });
+        makeObservable(this, { mxOption: observable, cellValues: observable, tplObj: observable });
 
         when(
             () => !!this.mxOption.mxObject,
@@ -50,7 +52,28 @@ export class Store {
             }
         );
     }
+    async checkAndGetFileDocumentOb() {
+        if (!this.mxOption.mxObject || !this.mxOption.tplFile) return null;
+        const parts = this.mxOption.tplFile.split("/");
+        const lastEntity = parts.slice(-2)[0];
+        //上下文是文档实体
+        if (this.mxOption.tplFile.indexOf("/") === -1 && this.mxOption.mxObject.inheritsFrom("System.FileDocument")) {
+            return this.mxOption.mxObject;
+        } else if (
+            this.mxOption.tplFile.indexOf("/") !== -1 &&
+            mx.meta.getEntity(lastEntity).inheritsFrom("System.FileDocument")
+        ) {
+            return await fetchEntityOverPath(this.mxOption.mxObject, this.mxOption.tplFile);
+        } else {
+            //error
+            mx.logger.error("UI组件 属性【模板文件】 必须是 System.FileDocument 或者其子实体的属性！");
+            return null;
+        }
+    }
     async update() {
+        const tplObj = await this.checkAndGetFileDocumentOb();
+        if (tplObj) this.tplObj = tplObj;
+
         if (this.mxOption.mxObject) {
             const objs = await fetchEntitysOverPath<mendix.lib.MxObject[]>(
                 this.mxOption.mxObject,
