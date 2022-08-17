@@ -2,6 +2,21 @@ import { WorkbookInstance } from "@fortune-sheet/react";
 import { RefObject } from "react";
 import { ValueType, Workbook } from "exceljs";
 import { getObject } from "@jeltemx/mendix-react-widget-utils";
+import { Sheet } from "@fortune-sheet/core";
+
+export async function writeToFile(sheets: Sheet[]) {
+    // https://github.com/exceljs/exceljs#writing-xlsx
+    const wb = new Workbook();
+    sheets.forEach(sheet => {
+        const worksheet = wb.addWorksheet(sheet.name);
+        const rowValues = [];
+        rowValues[1] = 4;
+        rowValues[5] = "Kyle";
+        rowValues[9] = new Date();
+        worksheet.addRow(rowValues);
+    });
+    return await wb.xlsx.writeBuffer();
+}
 
 export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: string) {
     const res = await fetch(url);

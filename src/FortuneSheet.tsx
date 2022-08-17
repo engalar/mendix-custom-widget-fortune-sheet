@@ -7,10 +7,9 @@ import { Store } from "./store";
 import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks";
 import data from "./data/empty";
 import { autorun } from "mobx";
-import { loadExcelTemplate } from "./store/util";
-import dojoon from "dojo/on";
+import { loadExcelTemplate, writeToFile } from "./store/util";
 
-export default function(props: ContainerProps) {
+export default function (props: ContainerProps) {
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
     const [inViewport] = useInViewport(refContainer);
@@ -26,7 +25,7 @@ export default function(props: ContainerProps) {
 
     useEffect(() => {
         store.mxOption = props;
-        return () => {};
+        return () => { };
     }, [store, props]);
 
     useUnmount(() => {
@@ -48,15 +47,17 @@ export default function(props: ContainerProps) {
             }
         });
 
-        // https://dojotoolkit.org/reference-guide/1.10/dojo/on.html#usage
-        const signal = dojoon(props.mxform.domNode, "submit", (e: any) => {
-            console.log(e);
+        const disp3 = (props.mxform as unknown as mxui.lib.form.ContentForm).listen("submit", (success, error,) => {
+            const sheets = ref.current!.getAllSheets();
+            writeToFile(sheets).then(buffer => {
+                mx.data.saveDocument(store.tplObjGuid!, 'demo' + new Date().getTime() + '.xlsx', {}, new Blob([new Uint8Array(buffer, 0, buffer.byteLength)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), success, error);
+            }).catch(error);
         });
 
         return () => {
             disp1();
             disp2();
-            signal.remove();
+            disp3();
         };
     }, []);
 
