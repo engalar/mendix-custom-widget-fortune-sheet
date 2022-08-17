@@ -8,6 +8,7 @@ import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks"
 import data from "./data/empty";
 import { autorun } from "mobx";
 import { loadExcelTemplate } from "./store/util";
+import dojoon from "dojo/on";
 
 export default function(props: ContainerProps) {
     const ref = useRef<WorkbookInstance>(null);
@@ -47,9 +48,15 @@ export default function(props: ContainerProps) {
             }
         });
 
+        // https://dojotoolkit.org/reference-guide/1.10/dojo/on.html#usage
+        const signal = dojoon(props.mxform.domNode, "submit", (e: any) => {
+            console.log(e);
+        });
+
         return () => {
             disp1();
             disp2();
+            signal.remove();
         };
     }, []);
 
