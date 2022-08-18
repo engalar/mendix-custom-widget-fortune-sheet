@@ -9,11 +9,36 @@ export async function writeToFile(sheets: Sheet[]) {
     const wb = new Workbook();
     sheets.forEach(sheet => {
         const worksheet = wb.addWorksheet(sheet.name);
-        const rowValues = [];
-        rowValues[1] = 4;
-        rowValues[5] = "Kyle";
-        rowValues[9] = new Date();
-        worksheet.addRow(rowValues);
+        sheet.data?.forEach((cellsOfRow, rowIndex) => {
+            worksheet.addRow([]);
+            cellsOfRow.forEach((cell, columnIndex) => {
+                const activeCell = worksheet.getCell(rowIndex + 1, columnIndex + 1);
+                // [cell](https://ruilisi.github.io/fortune-sheet-docs/guide/cell.html)
+                if (cell?.mc !== undefined) {
+                    if (cell.mc.r === rowIndex && cell.mc.c === columnIndex) {
+                        // [mergeCells](https://github.com/exceljs/exceljs#merged-cells)
+                        worksheet.mergeCells(
+                            cell.mc.r + 1,
+                            cell.mc.c + 1,
+                            cell.mc.r + cell.mc.rs!,
+                            cell.mc.c + cell.mc.cs!
+                        );
+                        activeCell.value = cell.v;
+                    }
+                    return;
+                }
+                if (cell?.f) {
+                    // [formula value](https://github.com/exceljs/exceljs#formula-value)
+                    activeCell.value = {
+                        formula: cell.f,
+                        date1904: false
+                    };
+                }
+                if (cell?.v) {
+                    activeCell.value = cell.v;
+                }
+            });
+        });
     });
     return await wb.xlsx.writeBuffer();
 }

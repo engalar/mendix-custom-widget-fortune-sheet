@@ -1,5 +1,6 @@
-import { createElement, useEffect, useMemo, useRef } from "react";
+import { createElement, useCallback, useEffect, useMemo, useRef } from "react";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
+import { Op } from '@fortune-sheet/core';
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
 import classNames from "classnames";
@@ -61,6 +62,10 @@ export default function (props: ContainerProps) {
         };
     }, []);
 
+    const onOp = useCallback((op: Op[]) => {
+        console.log(op);
+    }, []);
+
     return (
         <div
             ref={refContainer}
@@ -71,6 +76,7 @@ export default function (props: ContainerProps) {
                 ref={ref}
                 showFormulaBar={!props.readOnly}
                 allowEdit={true}
+                onOp={onOp}
                 showToolbar={!props.readOnly}
                 data={[data]}
             />
