@@ -44,6 +44,7 @@ export async function writeToFile(sheets: Sheet[]) {
 }
 
 export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: string) {
+    const h = mx.ui.showProgress("加载模板中。。。", true);
     const res = await fetch(url);
     const data = await res.arrayBuffer();
     const wbInstance = await new Workbook().xlsx.load(data);
@@ -69,6 +70,7 @@ export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: s
             }
         });
     });
+    mx.ui.hideProgress(h);
 }
 
 export async function fetchEntityOverPath(obj: mendix.lib.MxObject, attr = ""): Promise<mendix.lib.MxObject | null> {
