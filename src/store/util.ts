@@ -44,11 +44,12 @@ export async function writeToFile(sheets: Sheet[]) {
 }
 
 export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: string) {
-    const h = mx.ui.showProgress("加载模板中。。。", true);
+    const h = mx.ui.showProgress("加载模板。。。", true);
     const res = await fetch(url);
     const data = await res.arrayBuffer();
     const wbInstance = await new Workbook().xlsx.load(data);
 
+    //todo hard code
     wbInstance.worksheets[0].eachRow(row => {
         row.eachCell(cell => {
             if (cell.type !== ValueType.Merge) {
