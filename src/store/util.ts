@@ -4,7 +4,7 @@ import { ValueType, Workbook } from "exceljs";
 import { getObject } from "@jeltemx/mendix-react-widget-utils";
 import { Sheet } from "@fortune-sheet/core";
 
-export async function writeToFile(sheets: Sheet[]) {
+export async function writeToFile(sheets: Sheet[], ignoreSet: Set<string>) {
     // https://github.com/exceljs/exceljs#writing-xlsx
     const wb = new Workbook();
     sheets.forEach(sheet => {
@@ -12,6 +12,10 @@ export async function writeToFile(sheets: Sheet[]) {
         sheet.data?.forEach((cellsOfRow, rowIndex) => {
             worksheet.addRow([]);
             cellsOfRow.forEach((cell, columnIndex) => {
+                if (ignoreSet.has(rowIndex + 1 + "-" + (columnIndex + 1))) {
+                    // 业务数据不写入模板文件
+                    return;
+                }
                 const activeCell = worksheet.getCell(rowIndex + 1, columnIndex + 1);
                 // [cell](https://ruilisi.github.io/fortune-sheet-docs/guide/cell.html)
                 if (cell?.mc !== undefined) {

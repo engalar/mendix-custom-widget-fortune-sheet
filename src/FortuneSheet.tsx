@@ -51,7 +51,12 @@ export default function (props: ContainerProps) {
         const disp3 = (props.mxform as unknown as mxui.lib.form.ContentForm).listen("submit", (success, error,) => {
             const sheets = ref.current!.getAllSheets();
             const h = mx.ui.showProgress("保存模板。。。", true);
-            writeToFile(sheets).then(buffer => {
+
+            const ignoreSet = new Set<string>();
+            store.cellValues.forEach(d=>{
+                ignoreSet.add(d.RowIdx+'-'+d.ColIdx);
+            })
+            writeToFile(sheets, ignoreSet).then(buffer => {
                 mx.data.saveDocument(store.tplObjGuid!, 'demo' + new Date().getTime() + '.xlsx', {}, new Blob([new Uint8Array(buffer, 0, buffer.byteLength)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), () => {
                     mx.ui.hideProgress(h);
                     success();
