@@ -12,7 +12,7 @@
                     <caption>模板文件</caption>
                     <description></description>
                     <attributeTypes>
-                         <attributeType name="Binary" />
+                        <attributeType name="Binary" />
                     </attributeTypes>
                 </property>
             </propertyGroup>
@@ -85,5 +85,20 @@
                 </property>
             </propertyGroup>
         </propertyGroup>
+
+        <propertyGroup caption="事件">
+            <propertyGroup caption="保存">
+                <property key="saveEntity" type="entity" required="false" allowNonPersistableEntities="true">
+                    <caption>保存上下文实体</caption>
+                    <description></description>
+                </property>
+                <property key="saveMF" type="microflow" required="false" entityProperty="saveEntity">
+                    <caption>保存</caption>
+                    <description></description>
+                    <returnType type="Void" />
+                </property>
+            </propertyGroup>
+        </propertyGroup>
+
     </properties>
 </widget>
