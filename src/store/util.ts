@@ -3,7 +3,7 @@ import { RefObject } from "react";
 import { ValueType, Workbook } from "exceljs";
 import { getObject } from "@jeltemx/mendix-react-widget-utils";
 import { Sheet } from "@fortune-sheet/core";
-var parse = require("color-parse");
+const parse = require("color-parse");
 
 function p(n: number) {
     return n.toString(16).padStart(2, "0");
@@ -51,6 +51,9 @@ export async function writeToFile(sheets: Sheet[], ignoreSet: Set<string>) {
                     size: cell.fs
                 };
 
+                if (cell.ht !== undefined || cell.vt !== undefined) {
+                    activeCell.alignment = {};
+                }
                 // horizontal
                 switch (cell.ht) {
                     case 2:

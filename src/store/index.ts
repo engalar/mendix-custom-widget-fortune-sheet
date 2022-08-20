@@ -42,10 +42,6 @@ export class Store {
                         attr: "Horizontal",
                         callback: (guid, attr, value) => {
                             console.log(guid, attr, value);
-                            //等待视图刷新
-                            setTimeout(() => {
-                                console.log("wait for");
-                            }, 1);
                         }
                     },
                     //@ts-ignore
