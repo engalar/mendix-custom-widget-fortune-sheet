@@ -1,5 +1,6 @@
-import { createElement, useEffect, useMemo, useRef } from "react";
+import { createElement, useCallback, useEffect, useMemo, useRef } from "react";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
+import { Op } from "@fortune-sheet/core";
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
 import classNames from "classnames";
@@ -7,7 +8,7 @@ import { Store } from "./store";
 import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks";
 import data from "./data/empty";
 import { autorun } from "mobx";
-import { loadExcelTemplate } from "./store/util";
+import { loadExcelTemplate, writeToFile } from "./store/util";
 
 export default function(props: ContainerProps) {
     const ref = useRef<WorkbookInstance>(null);
@@ -24,7 +25,7 @@ export default function(props: ContainerProps) {
     const store = useMemo(() => new Store(props), []);
 
     useEffect(() => {
-        store.mxOption = props;
+        store.updateMxOption(props);
         return () => {};
     }, [store, props]);
 
@@ -47,10 +48,51 @@ export default function(props: ContainerProps) {
             }
         });
 
+        const disp3 = ((props.mxform as unknown) as mxui.lib.form.ContentForm).listen("submit", (success, error) => {
+            const sheets = ref.current!.getAllSheets();
+            const h = mx.ui.showProgress("保存模板。。。", true);
+
+            const ignoreSet = new Set<string>();
+            store.cellValues.forEach(d => {
+                ignoreSet.add(d.RowIdx + "-" + d.ColIdx);
+            });
+            writeToFile(sheets, ignoreSet)
+                .then(buffer => {
+                    mx.data.saveDocument(
+                        store.tplObjGuid!,
+                        "demo" + new Date().getTime() + ".xlsx",
+                        {},
+                        new Blob([new Uint8Array(buffer, 0, buffer.byteLength)], {
+                            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        }),
+                        () => {
+                            mx.ui.hideProgress(h);
+                            success();
+                        },
+                        err => {
+                            mx.ui.hideProgress(h);
+                            error(err);
+                        }
+                    );
+                })
+                .catch(error);
+        });
+
         return () => {
             disp1();
             disp2();
+            disp3();
         };
+    }, []);
+
+    const onOp = useCallback((op: Op[]) => {
+        console.log(op);
+        /**
+        id: "f603c141-a6f7-4ada-bb31-42f18e2f1774"
+op: "replace"
+path: (4) ['data', 9, 4, 'v']
+value: "89"
+         */
     }, []);
 
     return (
@@ -63,6 +105,7 @@ export default function(props: ContainerProps) {
                 ref={ref}
                 showFormulaBar={!props.readOnly}
                 allowEdit={true}
+                onOp={onOp}
                 showToolbar={!props.readOnly}
                 data={[data]}
             />

@@ -21,3 +21,22 @@ declare namespace mx {
         logger: mx.logger;
     }
 }
+
+declare namespace mxui {
+    namespace lib {
+        namespace form {
+            class ContentForm extends WebForm {
+                constructor();
+                destroy(): void;
+                listen(
+                    event: "validate" | "submit" | "commit" | "rollback" | "close" | "resume" | "toggleSidebar",
+                    process: (success: () => void, error: (error: Error) => void) => void
+                ): () => void;
+            }
+            class WebForm extends _FormBase {
+                constructor();
+                destroy(): void;
+            }
+        }
+    }
+}

@@ -1,3 +1,9 @@
+# todo
+
+-   [ ] enable commit btn
+-   [ ] collect change cell
+-   [ ] pass para
+
 ![demo](img/demo.png)
 
 # 重命名

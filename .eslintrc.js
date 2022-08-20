@@ -3,6 +3,7 @@ const base = require("@mendix/pluggable-widgets-tools/configs/eslint.ts.base.jso
 module.exports = {
     ...base,
     rules: {
+        "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/ban-ts-ignore": "warn",
         "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-empty-function": "off",

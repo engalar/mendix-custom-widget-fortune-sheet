@@ -1,7 +1,7 @@
 {
   "name": "fortunesheet",
   "widgetName": "FortuneSheet",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Template repo for legacy custome wiget",
   "copyright": "2021 Mendix",
   "author": "Liu Wengao <wengao.liu@siemens.com>",
@@ -16,6 +16,7 @@
     "testProject": "git clone https://gitee.com/engalar/mendix-testproject-960.git --depth=1 ./tests/testProject && rimraf  tests/testProject/.git",
     "start": "pluggable-widgets-tools start:server --open",
     "dev": "pluggable-widgets-tools start:js",
+    "widgetAPI": "node ./script/widgetAPI.js",
     "build": "pluggable-widgets-tools build:js",
     "lint": "pluggable-widgets-tools lint",
     "lint:fix": "pluggable-widgets-tools lint:fix",
@@ -57,19 +58,21 @@
     "rimraf": "^3.0.2",
     "tslint": "^5.20.1",
     "typescript": "^3.7.5",
-    "webpack-bundle-analyzer": "^3.6.0"
+    "webpack-bundle-analyzer": "^3.6.0",
+    "jszip": "^3.10.1"
   },
   "dependencies": {
-    "@fortune-sheet/react": "^0.5.8",
-    "ahooks": "^3.7.0",
     "@bem-react/classname": "^1.5.6",
+    "@fortune-sheet/react": "^0.5.8",
     "@jeltemx/mendix-react-widget-utils": "^0.9.0",
-    "exceljs": "^4.3.0",
+    "ahooks": "^3.7.0",
     "antd": "^4.15.5",
     "big.js": "^5.2.2",
     "classnames": "^2.2.6",
+    "color-parse": "^1.4.2",
+    "core-js": "2.6.5",
+    "exceljs": "^4.3.0",
     "mobx": "^6.3.10",
-    "mobx-react": "^7.2.1",
-    "core-js": "2.6.5"
+    "mobx-react": "^7.2.1"
   }
 }
