@@ -1,4 +1,4 @@
-import { configure, makeObservable, observable, when } from "mobx";
+import { action, configure, makeObservable, observable, runInAction, when } from "mobx";
 import { ContainerProps } from "../../typings/Props";
 import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 import { fetchEntityOverPath } from "./util";
@@ -27,7 +27,8 @@ export class Store {
             mxOption: observable,
             cellValues: observable,
             tplObjGuid: observable,
-            tplUrl: observable
+            tplUrl: observable,
+            updateMxOption: action
         });
 
         when(
@@ -79,8 +80,10 @@ export class Store {
     async update() {
         const tplObj = await this.checkAndGetFileDocumentOb();
         if (tplObj) {
-            this.tplObjGuid = tplObj.getGuid();
-            this.tplUrl = mx.data.getDocumentUrl(tplObj.getGuid(), tplObj.get("changedDate") as number);
+            runInAction(() => {
+                this.tplObjGuid = tplObj.getGuid();
+                this.tplUrl = mx.data.getDocumentUrl(tplObj.getGuid(), tplObj.get("changedDate") as number);
+            });
         }
 
         if (this.mxOption.mxObject) {
@@ -91,13 +94,18 @@ export class Store {
                     getReferencePart(this.mxOption.rowIndex, "entity")
             );
             const that = this;
-            that.cellValues = objs.map<CellValue>(obj => ({
-                RowIdx: Number(obj.get(that.mxOption.rowIndex.split("/").slice(-1)[0])),
-                ColIdx: Number(obj.get(that.mxOption.colIndex.split("/").slice(-1)[0])),
-                Value: obj.get(that.mxOption.value.split("/").slice(-1)[0]) as string,
-                ValueType: Number(obj.get(that.mxOption.valueType.split("/").slice(-1)[0]))
-            }));
+            runInAction(() => {
+                that.cellValues = objs.map<CellValue>(obj => ({
+                    RowIdx: Number(obj.get(that.mxOption.rowIndex.split("/").slice(-1)[0])),
+                    ColIdx: Number(obj.get(that.mxOption.colIndex.split("/").slice(-1)[0])),
+                    Value: obj.get(that.mxOption.value.split("/").slice(-1)[0]) as string,
+                    ValueType: Number(obj.get(that.mxOption.valueType.split("/").slice(-1)[0]))
+                }));
+            });
         }
+    }
+    updateMxOption(e: ContainerProps) {
+        this.mxOption = e;
     }
 }
 

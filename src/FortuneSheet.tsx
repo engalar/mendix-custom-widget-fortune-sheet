@@ -25,7 +25,7 @@ export default function (props: ContainerProps) {
     const store = useMemo(() => new Store(props), []);
 
     useEffect(() => {
-        store.mxOption = props;
+        store.updateMxOption(props);
         return () => { };
     }, [store, props]);
 
@@ -53,8 +53,8 @@ export default function (props: ContainerProps) {
             const h = mx.ui.showProgress("保存模板。。。", true);
 
             const ignoreSet = new Set<string>();
-            store.cellValues.forEach(d=>{
-                ignoreSet.add(d.RowIdx+'-'+d.ColIdx);
+            store.cellValues.forEach(d => {
+                ignoreSet.add(d.RowIdx + '-' + d.ColIdx);
             })
             writeToFile(sheets, ignoreSet).then(buffer => {
                 mx.data.saveDocument(store.tplObjGuid!, 'demo' + new Date().getTime() + '.xlsx', {}, new Blob([new Uint8Array(buffer, 0, buffer.byteLength)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), () => {

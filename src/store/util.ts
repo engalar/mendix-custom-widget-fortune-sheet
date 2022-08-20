@@ -3,7 +3,21 @@ import { RefObject } from "react";
 import { ValueType, Workbook } from "exceljs";
 import { getObject } from "@jeltemx/mendix-react-widget-utils";
 import { Sheet } from "@fortune-sheet/core";
+var parse = require("color-parse");
 
+function p(n: number) {
+    return n.toString(16).padStart(2, "0");
+}
+
+function newFunction(colorString: string | undefined) {
+    return colorString
+        ? {
+              argb: parse(colorString)
+                  .values.map(p)
+                  .join("") as string
+          }
+        : undefined;
+}
 export async function writeToFile(sheets: Sheet[], ignoreSet: Set<string>) {
     // https://github.com/exceljs/exceljs#writing-xlsx
     const wb = new Workbook();
@@ -12,11 +26,61 @@ export async function writeToFile(sheets: Sheet[], ignoreSet: Set<string>) {
         sheet.data?.forEach((cellsOfRow, rowIndex) => {
             worksheet.addRow([]);
             cellsOfRow.forEach((cell, columnIndex) => {
-                if (ignoreSet.has(rowIndex + 1 + "-" + (columnIndex + 1))) {
+                if (cell === null || ignoreSet.has(rowIndex + 1 + "-" + (columnIndex + 1))) {
                     // 业务数据不写入模板文件
                     return;
                 }
                 const activeCell = worksheet.getCell(rowIndex + 1, columnIndex + 1);
+                const fgColor = newFunction(cell.fc);
+                const bgColor = newFunction(cell.bg);
+                // todo dumy style
+                // https://github.com/exceljs/exceljs#styles
+                // https://ruilisi.github.io/fortune-sheet-docs/guide/cell.html
+
+                //https://github.com/exceljs/exceljs/blob/860b862d122c2645f8b34f0f885a64b104f7a538/test/test-colour-cell.js#L10
+                activeCell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    // fgColor: fgColor,
+                    bgColor
+                };
+                activeCell.font = {
+                    name: cell.ct?.fa,
+                    color: fgColor,
+                    bold: cell.bl == 1,
+                    size: cell.fs
+                };
+
+                // horizontal
+                switch (cell.ht) {
+                    case 2:
+                        activeCell.alignment.horizontal = "right";
+                        break;
+                    case 1:
+                        activeCell.alignment.horizontal = "left";
+                        break;
+                    case 0:
+                        activeCell.alignment.horizontal = "center";
+                        break;
+                    default:
+                        break;
+                }
+
+                // vertical
+                switch (cell.vt) {
+                    case 2:
+                        activeCell.alignment.vertical = "bottom";
+                        break;
+                    case 1:
+                        activeCell.alignment.vertical = "top";
+                        break;
+                    case 0:
+                        activeCell.alignment.vertical = "middle";
+                        break;
+                    default:
+                        break;
+                }
+
                 // [cell](https://ruilisi.github.io/fortune-sheet-docs/guide/cell.html)
                 if (cell?.mc !== undefined) {
                     if (cell.mc.r === rowIndex && cell.mc.c === columnIndex) {
@@ -60,6 +124,12 @@ export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: s
                 ref.current?.setCellValue(Number(cell.row) - 1, Number(cell.col) - 1, cell.value, {
                     type: cell.formula ? "f" : "v"
                 });
+                ref.current?.setCellFormat(
+                    Number(cell.row) - 1,
+                    Number(cell.col) - 1,
+                    "ht",
+                    cell.style.alignment?.horizontal === "center" ? 0 : undefined
+                );
                 if (cell.isMerged) {
                     //@ts-ignore:next-line
                     const range = wbInstance.worksheets[0]._merges[cell.address].model;
