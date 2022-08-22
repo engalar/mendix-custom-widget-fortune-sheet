@@ -160,6 +160,13 @@ export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: s
                         break;
                 }
                 ref.current?.setCellFormat(Number(cell.row) - 1, Number(cell.col) - 1, "ht", horizontal);
+
+                // bg color
+                let bg = undefined;
+                if (cell.fill && cell.fill.type === "pattern") bg = `#${cell.fill.fgColor}`;
+                if (bg) {
+                    ref.current?.setCellFormat(Number(cell.row) - 1, Number(cell.col) - 1, "bg", bg);
+                }
             } else {
                 //https://github.com/exceljs/exceljs#merged-cells
             }
