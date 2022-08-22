@@ -1,4 +1,4 @@
-import { action, configure, makeObservable, observable, runInAction, when } from "mobx";
+import { action, computed, configure, makeObservable, observable, runInAction, when } from "mobx";
 import { ContainerProps } from "../../typings/Props";
 import { entityIsFileDocument, getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 import { fetchEntityOverPath } from "./util";
@@ -10,6 +10,7 @@ export interface CellValue {
     ColIdx: number;
     ValueType: number;
     Value: string;
+    guid: string;
 }
 
 export class Store {
@@ -17,6 +18,13 @@ export class Store {
     tplObjGuid?: string;
     tplUrl?: string;
     sub?: mx.Subscription;
+    get m() {
+        const map = new Map<string, number>();
+        this.cellValues.forEach((v, i) => {
+            map.set(`${v.RowIdx}-${v.ColIdx}`, i);
+        });
+        return map;
+    }
     /**
      * dispose
      */
@@ -28,7 +36,8 @@ export class Store {
             cellValues: observable,
             tplObjGuid: observable,
             tplUrl: observable,
-            updateMxOption: action
+            updateMxOption: action,
+            m: computed
         });
 
         when(
@@ -93,7 +102,8 @@ export class Store {
                     RowIdx: Number(obj.get(that.mxOption.rowIndex.split("/").slice(-1)[0])),
                     ColIdx: Number(obj.get(that.mxOption.colIndex.split("/").slice(-1)[0])),
                     Value: obj.get(that.mxOption.value.split("/").slice(-1)[0]) as string,
-                    ValueType: Number(obj.get(that.mxOption.valueType.split("/").slice(-1)[0]))
+                    ValueType: Number(obj.get(that.mxOption.valueType.split("/").slice(-1)[0])),
+                    guid: obj.getGuid()
                 }));
             });
         }

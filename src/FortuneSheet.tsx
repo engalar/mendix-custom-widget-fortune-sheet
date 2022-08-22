@@ -1,4 +1,4 @@
-import { createElement, useCallback, useEffect, useMemo, useRef } from "react";
+import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
 import { Op } from "@fortune-sheet/core";
 import { ContainerProps } from "../typings/Props";
@@ -12,6 +12,7 @@ import { loadExcelTemplate, writeToFile } from "./store/util";
 import { createObject, executeMicroflow, getObjectContext, getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 
 export default function (props: ContainerProps) {
+    const [modifiedCellSet] = useState(new Set<string>());
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
     const [inViewport] = useInViewport(refContainer);
@@ -75,6 +76,11 @@ export default function (props: ContainerProps) {
                         () => {
                             mx.ui.hideProgress(h);
                             success();
+                            modifiedCellSet.forEach(d => {
+                                if (!ignoreSet.has(d)) {
+                                    modifiedCellSet.delete(d);
+                                }
+                            })
                         },
                         err => {
                             mx.ui.hideProgress(h);
@@ -83,6 +89,14 @@ export default function (props: ContainerProps) {
                     );
                 })
                 .catch(error);
+
+            // todo save entity data
+            const modifiedGuids = Array.from(modifiedCellSet.keys()).filter(d => store.m.has(d)).map(d => {
+                const index = store.m.get(d);
+                // todo create new entity to dumy it/ reuse old one
+                return store.cellValues[index!].guid;
+            });
+            save(modifiedGuids, props.saveEntity, props.assoChange, props.saveMF, props.mxform);
         });
 
         return () => {
@@ -93,13 +107,17 @@ export default function (props: ContainerProps) {
     }, []);
 
     const onOp = useCallback((op: Op[]) => {
-        console.log(op);
         /**
         id: "f603c141-a6f7-4ada-bb31-42f18e2f1774"
 op: "replace"
 path: (4) ['data', 9, 4, 'v']
 value: "89"
          */
+        op.forEach(d => {
+            if (d.path[3] === 'v') {
+                modifiedCellSet.add(`${d.path[1]}-${d.path[2]}`)
+            }
+        })
     }, []);
 
     return (
