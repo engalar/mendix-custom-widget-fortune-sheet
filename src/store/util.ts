@@ -38,18 +38,21 @@ export async function writeToFile(sheets: Sheet[], ignoreSet: Set<string>) {
                 // https://ruilisi.github.io/fortune-sheet-docs/guide/cell.html
 
                 //https://github.com/exceljs/exceljs/blob/860b862d122c2645f8b34f0f885a64b104f7a538/test/test-colour-cell.js#L10
-                activeCell.fill = {
-                    type: "pattern",
-                    pattern: "solid",
-                    // fgColor: fgColor,
-                    bgColor
-                };
-                activeCell.font = {
-                    name: cell.ct?.fa,
-                    color: fgColor,
-                    bold: cell.bl == 1,
-                    size: cell.fs
-                };
+                if (bgColor) {
+                    activeCell.fill = {
+                        type: "pattern",
+                        pattern: "solid",
+                        fgColor: bgColor
+                        // bgColor
+                    };
+                }
+                if (fgColor)
+                    activeCell.font = {
+                        name: cell.ct?.fa,
+                        color: fgColor,
+                        bold: cell.bl == 1,
+                        size: cell.fs
+                    };
 
                 if (cell.ht !== undefined || cell.vt !== undefined) {
                     activeCell.alignment = {};
