@@ -9,7 +9,7 @@ import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks"
 import data from "./data/empty";
 import { autorun } from "mobx";
 import { loadExcelTemplate, writeToFile } from "./store/util";
-import { createObject, executeMicroflow, getObjectContext } from "@jeltemx/mendix-react-widget-utils";
+import { createObject, executeMicroflow, getObjectContext, getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 
 export default function (props: ContainerProps) {
     const ref = useRef<WorkbookInstance>(null);
@@ -35,6 +35,12 @@ export default function (props: ContainerProps) {
     });
 
     useEffect(() => {
+        // one time check
+        if (props.assoChange !== "" && props.cellEntity !== getReferencePart(props.assoChange, "entity")
+        ) {
+            mx.logger.error(`组件【${props.uniqueid}】: 实体【单元格->数据实体】 必须与 实体【事件->保存->关联】 一致`);
+        }
+
         const disp1 = autorun(async () => {
             store.cellValues.forEach(cell => {
                 ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
@@ -131,7 +137,7 @@ const parseStyle = (style = ""): { [key: string]: string } => {
 
 export async function save(guids: string[] | number[], saveEntity: string, assosiation: string, mf: string, mxform: mxui.lib.form._FormBase) {
     const obj = await createObject(saveEntity);
-    obj.addReferences(assosiation, guids);
+    obj.addReferences(getReferencePart(assosiation, 'referenceAttr'), guids);
     const actionReturn = await executeMicroflow(mf, getObjectContext(obj), mxform);
     return actionReturn;
 }
