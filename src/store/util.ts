@@ -180,7 +180,7 @@ export async function fetchEntityOverPath(obj: mendix.lib.MxObject, attr = ""): 
         return obj;
     }
     const parts = attr.split("/");
-    if (obj.isObjectReference(parts[0]) && parts.length >= 3) {
+    if (obj.isObjectReference(parts[0]) && parts.length >= 2) {
         const ref = obj.getReference(parts[0]);
         if (ref) {
             const refObj = await getObject(ref);
