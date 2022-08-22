@@ -130,12 +130,7 @@ export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: s
                 ref.current?.setCellValue(Number(cell.row) - 1, Number(cell.col) - 1, cell.value, {
                     type: cell.formula ? "f" : "v"
                 });
-                ref.current?.setCellFormat(
-                    Number(cell.row) - 1,
-                    Number(cell.col) - 1,
-                    "ht",
-                    cell.style.alignment?.horizontal === "center" ? 0 : undefined
-                );
+
                 if (cell.isMerged) {
                     //@ts-ignore:next-line
                     const range = wbInstance.worksheets[0]._merges[cell.address].model;
@@ -146,6 +141,25 @@ export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: s
                         "merge-all"
                     );
                 }
+
+                // style cfg must after merge
+                // 水平对齐
+                let horizontal = undefined;
+                switch (cell.style.alignment?.horizontal) {
+                    case "left":
+                        horizontal = "1";
+                        break;
+                    case "center":
+                        horizontal = "0";
+                        break;
+                    case "right":
+                        horizontal = "2";
+                        break;
+
+                    default:
+                        break;
+                }
+                ref.current?.setCellFormat(Number(cell.row) - 1, Number(cell.col) - 1, "ht", horizontal);
             } else {
                 //https://github.com/exceljs/exceljs#merged-cells
             }
