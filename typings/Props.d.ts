@@ -20,6 +20,9 @@ interface CommonProps {
 }
 
 interface _W {
+    assoChange: string;
+    saveMF: string;
+    saveEntity: string;
     tplFile: string;
     top: string;
     bottom: string;

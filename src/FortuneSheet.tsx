@@ -9,8 +9,9 @@ import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks"
 import data from "./data/empty";
 import { autorun } from "mobx";
 import { loadExcelTemplate, writeToFile } from "./store/util";
+import { createObject, executeMicroflow, getObjectContext } from "@jeltemx/mendix-react-widget-utils";
 
-export default function(props: ContainerProps) {
+export default function (props: ContainerProps) {
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
     const [inViewport] = useInViewport(refContainer);
@@ -26,7 +27,7 @@ export default function(props: ContainerProps) {
 
     useEffect(() => {
         store.updateMxOption(props);
-        return () => {};
+        return () => { };
     }, [store, props]);
 
     useUnmount(() => {
@@ -127,3 +128,10 @@ const parseStyle = (style = ""): { [key: string]: string } => {
         return {};
     }
 };
+
+export async function save(guids: string[] | number[], saveEntity: string, assosiation: string, mf: string, mxform: mxui.lib.form._FormBase) {
+    const obj = await createObject(saveEntity);
+    obj.addReferences(assosiation, guids);
+    const actionReturn = await executeMicroflow(mf, getObjectContext(obj), mxform);
+    return actionReturn;
+}

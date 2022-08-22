@@ -17,10 +17,7 @@ type VisibilityMap = {
 };
 
 export function getVisibleProperties(props: ContainerProps, visibilityMap: VisibilityMap): VisibilityMap {
-    // visibilityMap.nodeConstraint = props.nodeDataSource === "xpath";
-    // visibilityMap.nodeGetDataMicroflow = props.nodeDataSource === "microflow";
-    // visibilityMap.nodeGetDataNanoflow = props.nodeDataSource === "nanoflow";
-    console.log(props);
-
+    visibilityMap.assoChange = props.saveEntity !== "";
+    visibilityMap.saveMF = props.assoChange !== "" && props.saveEntity !== "";
     return visibilityMap;
 }
