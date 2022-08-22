@@ -1,11 +1,11 @@
 import { action, configure, makeObservable, observable, runInAction, when } from "mobx";
 import { ContainerProps } from "../../typings/Props";
-import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
+import { entityIsFileDocument, getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 import { fetchEntityOverPath } from "./util";
 
 configure({ enforceActions: "observed", isolateGlobalState: true, useProxies: "never" });
 
-interface CellValue {
+export interface CellValue {
     RowIdx: number;
     ColIdx: number;
     ValueType: number;
@@ -56,17 +56,15 @@ export class Store {
         );
     }
     async checkAndGetFileDocumentOb() {
-        if (!this.mxOption.mxObject || !this.mxOption.tplFile) return null;
-        const parts = this.mxOption.tplFile.split("/");
-        const lastEntity = parts.slice(-2)[0];
+        if (!this.mxOption.mxObject || !this.mxOption.templateEntity) return null;
+        const parts = this.mxOption.templateEntity.split("/");
+        const lastEntity = parts.slice(-1)[0];
         //上下文是文档实体
-        if (this.mxOption.tplFile.indexOf("/") === -1 && this.mxOption.mxObject.inheritsFrom("System.FileDocument")) {
+        if (this.mxOption.templateEntity === "" && entityIsFileDocument(this.mxOption.mxObject.getEntity())) {
+            mx.logger.debug("没有额外指定模板文件关联，默认为当前上下文实体");
             return this.mxOption.mxObject;
-        } else if (
-            this.mxOption.tplFile.indexOf("/") !== -1 &&
-            mx.meta.getEntity(lastEntity).inheritsFrom("System.FileDocument")
-        ) {
-            return await fetchEntityOverPath(this.mxOption.mxObject, this.mxOption.tplFile);
+        } else if (this.mxOption.templateEntity.indexOf("/") !== -1 && entityIsFileDocument(lastEntity)) {
+            return await fetchEntityOverPath(this.mxOption.mxObject, this.mxOption.templateEntity);
         } else {
             //error
             mx.logger.error("UI组件 属性【模板文件】 必须是 System.FileDocument 或者其子实体的属性！");

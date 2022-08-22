@@ -23,7 +23,7 @@ interface _W {
     assoChange: string;
     saveMF: string;
     saveEntity: string;
-    tplFile: string;
+    templateEntity: string;
     top: string;
     bottom: string;
     left: string;

@@ -8,12 +8,9 @@
     <properties>
         <propertyGroup caption="通用">
             <propertyGroup caption="模板文件">
-                <property key="tplFile" type="attribute" required="false" isPath="optional" pathType="reference" allowNonPersistableEntities="true">
-                    <caption>模板文件</caption>
-                    <description></description>
-                    <attributeTypes>
-                        <attributeType name="Binary" />
-                    </attributeTypes>
+                <property key="templateEntity" allowNonPersistableEntities="true" type="entity" required="false" isPath="yes" pathType="reference">
+                    <caption>关联</caption>
+                    <description>获取模板实体</description>
                 </property>
             </propertyGroup>
             <propertyGroup caption="单元格">
