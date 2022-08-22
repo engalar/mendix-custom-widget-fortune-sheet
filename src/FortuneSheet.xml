@@ -91,11 +91,11 @@
                 </property>
                 <property key="assoChange" type="entity" required="false" allowNonPersistableEntities="true" entityProperty="saveEntity" isPath="yes" pathType="referenceSet">
                     <caption>关联</caption>
-                    <description>获取变化实体列表</description>
+                    <description>获取变化实体列表；会把变化的单元格数据通过本关联挂载到 保存上下文实体 上</description>
                 </property>
                 <property key="saveMF" type="microflow" required="false" entityProperty="saveEntity">
                     <caption>保存</caption>
-                    <description></description>
+                    <description>保存时调用的微流</description>
                     <returnType type="Void" />
                 </property>
             </propertyGroup>
