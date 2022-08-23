@@ -1,7 +1,16 @@
-import { action, computed, configure, makeObservable, observable, runInAction, when } from "mobx";
+import {
+    action,
+    computed,
+    configure,
+    flow,
+    makeObservable,
+    observable,
+    when
+} from "mobx";
 import { ContainerProps } from "../../typings/Props";
 import { entityIsFileDocument, getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 import { fetchEntityOverPath } from "./util";
+import { fetchEntitysOverPath } from "../mendix/fetchEntitysOverPath";
 
 configure({ enforceActions: "observed", isolateGlobalState: true, useProxies: "never" });
 
@@ -64,7 +73,46 @@ export class Store {
             }
         );
     }
-    async checkAndGetFileDocumentOb() {
+
+    async update() {
+        await this.loadTemplateExcel();
+
+        await this.loadCellValue();
+    }
+
+    loadTemplateExcel = flow(function*(this: Store): Generator<Promise<mendix.lib.MxObject | null>, void, any> {
+        const tplObj: any = yield this.checkAndGetFileDocumentObject();
+        if (tplObj) {
+            this.tplObjGuid = tplObj.getGuid();
+            this.tplUrl = mx.data.getDocumentUrl(tplObj.getGuid(), tplObj.get("changedDate") as number);
+        }
+    });
+
+    loadCellValue = flow(function*(
+        this: Store
+    ): Generator<Promise<mendix.lib.MxObject[]>, void, mendix.lib.MxObject[]> {
+        if (this.mxOption.mxObject) {
+            const objs = yield fetchEntitysOverPath<mendix.lib.MxObject[]>(
+                this.mxOption.mxObject,
+                getReferencePart(this.mxOption.rowIndex, "referenceAttr") +
+                    "/" +
+                    getReferencePart(this.mxOption.rowIndex, "entity")
+            );
+            this.cellValues = objs.map<CellValue>(obj => ({
+                RowIdx: Number(obj.get(this.mxOption.rowIndex.split("/").slice(-1)[0])),
+                ColIdx: Number(obj.get(this.mxOption.colIndex.split("/").slice(-1)[0])),
+                Value: obj.get(this.mxOption.value.split("/").slice(-1)[0]) as string,
+                ValueType: Number(obj.get(this.mxOption.valueType.split("/").slice(-1)[0])),
+                guid: obj.getGuid()
+            }));
+        }
+    });
+
+    updateMxOption(e: ContainerProps) {
+        this.mxOption = e;
+    }
+
+    async checkAndGetFileDocumentObject() {
         if (!this.mxOption.mxObject || !this.mxOption.templateEntity) return null;
         const parts = this.mxOption.templateEntity.split("/");
         const lastEntity = parts.slice(-1)[0];
@@ -80,43 +128,4 @@ export class Store {
             return null;
         }
     }
-    async update() {
-        const tplObj = await this.checkAndGetFileDocumentOb();
-        if (tplObj) {
-            runInAction(() => {
-                this.tplObjGuid = tplObj.getGuid();
-                this.tplUrl = mx.data.getDocumentUrl(tplObj.getGuid(), tplObj.get("changedDate") as number);
-            });
-        }
-
-        if (this.mxOption.mxObject) {
-            const objs = await fetchEntitysOverPath<mendix.lib.MxObject[]>(
-                this.mxOption.mxObject,
-                getReferencePart(this.mxOption.rowIndex, "referenceAttr") +
-                    "/" +
-                    getReferencePart(this.mxOption.rowIndex, "entity")
-            );
-            const that = this;
-            runInAction(() => {
-                that.cellValues = objs.map<CellValue>(obj => ({
-                    RowIdx: Number(obj.get(that.mxOption.rowIndex.split("/").slice(-1)[0])),
-                    ColIdx: Number(obj.get(that.mxOption.colIndex.split("/").slice(-1)[0])),
-                    Value: obj.get(that.mxOption.value.split("/").slice(-1)[0]) as string,
-                    ValueType: Number(obj.get(that.mxOption.valueType.split("/").slice(-1)[0])),
-                    guid: obj.getGuid()
-                }));
-            });
-        }
-    }
-    updateMxOption(e: ContainerProps) {
-        this.mxOption = e;
-    }
-}
-
-async function fetchEntitysOverPath<T>(obj: mendix.lib.MxObject, path: string) {
-    return new Promise<T>((resolve, _reject) => {
-        obj.fetch(path, objs => {
-            resolve(objs);
-        });
-    });
 }

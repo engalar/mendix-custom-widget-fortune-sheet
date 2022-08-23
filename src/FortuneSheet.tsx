@@ -9,7 +9,8 @@ import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks"
 import data from "./data/empty";
 import { autorun } from "mobx";
 import { loadExcelTemplate, writeToFile } from "./store/util";
-import { createObject, executeMicroflow, getObjectContext, getReferencePart } from "@jeltemx/mendix-react-widget-utils";
+import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
+import { persistentEntity } from "./persistent/entity";
 
 export default function (props: ContainerProps) {
     const [modifiedCellSet] = useState(new Set<string>());
@@ -96,7 +97,7 @@ export default function (props: ContainerProps) {
                 // todo create new entity to dumy it/ reuse old one
                 return store.cellValues[index!].guid;
             });
-            save(modifiedGuids, props.saveEntity, props.assoChange, props.saveMF, props.mxform);
+            persistentEntity(modifiedGuids, props.saveEntity, props.assoChange, props.saveMF, props.mxform);
         });
 
         return () => {
@@ -107,15 +108,9 @@ export default function (props: ContainerProps) {
     }, []);
 
     const onOp = useCallback((op: Op[]) => {
-        /**
-        id: "f603c141-a6f7-4ada-bb31-42f18e2f1774"
-op: "replace"
-path: (4) ['data', 9, 4, 'v']
-value: "89"
-         */
         op.forEach(d => {
-            if (d.path[3] === 'v') {
-                modifiedCellSet.add(`${d.path[1]}-${d.path[2]}`)
+            if (d.path.length === 3 && d.value?.v) {
+                modifiedCellSet.add(`${Number(d.path[1]) + 1}-${Number(d.path[2]) + 1}`)
             }
         })
     }, []);
@@ -152,10 +147,3 @@ const parseStyle = (style = ""): { [key: string]: string } => {
         return {};
     }
 };
-
-export async function save(guids: string[] | number[], saveEntity: string, assosiation: string, mf: string, mxform: mxui.lib.form._FormBase) {
-    const obj = await createObject(saveEntity);
-    obj.addReferences(getReferencePart(assosiation, 'referenceAttr'), guids);
-    const actionReturn = await executeMicroflow(mf, getObjectContext(obj), mxform);
-    return actionReturn;
-}
