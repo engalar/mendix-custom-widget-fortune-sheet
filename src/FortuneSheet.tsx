@@ -11,8 +11,10 @@ import { autorun } from "mobx";
 import { loadExcelTemplate, writeToFile } from "./store/util";
 import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 import { persistentEntity } from "./persistent/entity";
+import { redraw } from "./view/util";
 
 export default function (props: ContainerProps) {
+    const [errorMsg, setErrorMsg] = useState<string>();
     const [modifiedCellSet] = useState(new Set<string>());
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
@@ -21,7 +23,7 @@ export default function (props: ContainerProps) {
     useUpdateEffect(() => {
         if (inViewport && !preInViewPort) {
             //trick redraw
-            window.dispatchEvent(new Event("resize"));
+            redraw();
         }
     }, [inViewport]);
 
@@ -38,9 +40,10 @@ export default function (props: ContainerProps) {
 
     useEffect(() => {
         // one time check
-        if (props.assoChange !== "" && props.cellEntity !== getReferencePart(props.assoChange, "entity")
-        ) {
-            mx.logger.error(`组件【${props.uniqueid}】: 实体【单元格->数据实体】 必须与 实体【事件->保存->关联】 一致`);
+        if (props.assoChange !== "" && props.cellEntity !== getReferencePart(props.assoChange, "entity")) {
+            const msg = `组件【${props.uniqueid}】: 实体【单元格->数据实体】 必须与 实体【事件->保存->关联】 一致`;
+            mx.logger.error(msg);
+            setErrorMsg(msg);
         }
 
         const disp1 = autorun(async () => {
@@ -81,7 +84,7 @@ export default function (props: ContainerProps) {
                                 if (!ignoreSet.has(d)) {
                                     modifiedCellSet.delete(d);
                                 }
-                            })
+                            });
                         },
                         err => {
                             mx.ui.hideProgress(h);
@@ -92,11 +95,13 @@ export default function (props: ContainerProps) {
                 .catch(error);
 
             // todo save entity data
-            const modifiedGuids = Array.from(modifiedCellSet.keys()).filter(d => store.m.has(d)).map(d => {
-                const index = store.m.get(d);
-                // todo create new entity to dumy it/ reuse old one
-                return store.cellValues[index!].guid;
-            });
+            const modifiedGuids = Array.from(modifiedCellSet.keys())
+                .filter(d => store.m.has(d))
+                .map(d => {
+                    const index = store.m.get(d);
+                    // todo create new entity to dumy it/ reuse old one
+                    return store.cellValues[index!].guid;
+                });
             persistentEntity(modifiedGuids, props.saveEntity, props.assoChange, props.saveMF, props.mxform);
         });
 
@@ -110,9 +115,9 @@ export default function (props: ContainerProps) {
     const onOp = useCallback((op: Op[]) => {
         op.forEach(d => {
             if (d.path.length === 3 && d.value?.v) {
-                modifiedCellSet.add(`${Number(d.path[1]) + 1}-${Number(d.path[2]) + 1}`)
+                modifiedCellSet.add(`${Number(d.path[1]) + 1}-${Number(d.path[2]) + 1}`);
             }
-        })
+        });
     }, []);
 
     return (
@@ -120,15 +125,15 @@ export default function (props: ContainerProps) {
             ref={refContainer}
             className={classNames("mendixcn-fortune-sheet", props.class)}
             style={parseStyle(props.style)}
-        >
-            <Workbook
+        >{errorMsg ? <span className="alert-danger">{errorMsg}</span>
+            : <Workbook
                 ref={ref}
                 showFormulaBar={!props.readOnly}
                 allowEdit={true}
                 onOp={onOp}
                 showToolbar={!props.readOnly}
                 data={[data]}
-            />
+            />}
         </div>
     );
 }

@@ -3,6 +3,7 @@ import { RefObject } from "react";
 import { ValueType, Workbook } from "exceljs";
 import { getObject } from "@jeltemx/mendix-react-widget-utils";
 import { Sheet } from "@fortune-sheet/core";
+import { redraw } from "../view/util";
 const parse = require("color-parse");
 
 function p(n: number) {
@@ -172,6 +173,7 @@ export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: s
             }
         });
     });
+    redraw();
     mx.ui.hideProgress(h);
 }
 
