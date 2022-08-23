@@ -1,16 +1,9 @@
-import {
-    action,
-    computed,
-    configure,
-    flow,
-    makeObservable,
-    observable,
-    when
-} from "mobx";
+import { action, computed, configure, flow, makeObservable, observable, when } from "mobx";
 import { ContainerProps } from "../../typings/Props";
 import { entityIsFileDocument, getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 import { fetchEntityOverPath } from "./util";
 import { fetchEntitysOverPath } from "../mendix/fetchEntitysOverPath";
+import { ModifiedStore } from "./ModifiedStore";
 
 configure({ enforceActions: "observed", isolateGlobalState: true, useProxies: "never" });
 
@@ -27,6 +20,8 @@ export class Store {
     tplObjGuid?: string;
     tplUrl?: string;
     sub?: mx.Subscription;
+    disposer: any;
+    modifiedStore: ModifiedStore;
     get m() {
         const map = new Map<string, number>();
         this.cellValues.forEach((v, i) => {
@@ -37,7 +32,9 @@ export class Store {
     /**
      * dispose
      */
-    public dispose() {}
+    public dispose() {
+        this.disposer();
+    }
 
     constructor(public mxOption: ContainerProps) {
         makeObservable(this, {
@@ -49,22 +46,10 @@ export class Store {
             m: computed
         });
 
-        when(
+        this.disposer = when(
             () => !!this.mxOption.mxObject,
             () => {
                 this.update();
-
-                this.sub = mx.data.subscribe(
-                    {
-                        guid: this.mxOption.mxObject!.getGuid(),
-                        attr: "Horizontal",
-                        callback: (guid, attr, value) => {
-                            console.log(guid, attr, value);
-                        }
-                    },
-                    //@ts-ignore
-                    this.mxOption.mxform
-                );
             },
             {
                 onError(e) {
@@ -72,6 +57,8 @@ export class Store {
                 }
             }
         );
+
+        this.modifiedStore = new ModifiedStore();
     }
 
     async update() {

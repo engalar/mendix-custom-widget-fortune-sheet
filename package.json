@@ -57,7 +57,7 @@
     "pluggable-widgets-typing-generator": "3.1.0",
     "rimraf": "^3.0.2",
     "tslint": "^5.20.1",
-    "typescript": "^3.7.5",
+    "typescript": "^3.7.7",
     "webpack-bundle-analyzer": "^3.6.0",
     "jszip": "^3.10.1"
   },

@@ -1,8 +1,4 @@
-import {
-    makeObservable,
-    observable
-} from "mobx";
-
+import { makeObservable, observable } from "mobx";
 
 export interface Location {
     row: number;
