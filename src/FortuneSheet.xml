@@ -14,32 +14,32 @@
                 </property>
             </propertyGroup>
             <propertyGroup caption="单元格">
-                <property key="cellEntity" type="entity" required="true" allowNonPersistableEntities="true">
+                <property key="cellEntity" type="entity" required="true" allowNonPersistableEntities="true" isPath="yes" pathType="referenceSet">
                     <caption>数据实体</caption>
                     <description></description>
                 </property>
-                <property key="rowIndex" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                <property key="rowIndex" type="attribute" required="false" entityProperty="cellEntity">
                     <caption>行索引</caption>
                     <description></description>
                     <attributeTypes>
                         <attributeType name="Integer" />
                     </attributeTypes>
                 </property>
-                <property key="colIndex" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                <property key="colIndex" type="attribute" required="false" entityProperty="cellEntity">
                     <caption>列索引</caption>
                     <description></description>
                     <attributeTypes>
                         <attributeType name="Integer" />
                     </attributeTypes>
                 </property>
-                <property key="valueType" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                <property key="valueType" type="attribute" required="false" entityProperty="cellEntity">
                     <caption>值类型</caption>
                     <description></description>
                     <attributeTypes>
                         <attributeType name="Integer" />
                     </attributeTypes>
                 </property>
-                <property key="value" type="attribute" required="false" isPath="yes" pathType="referenceSet" allowNonPersistableEntities="true">
+                <property key="value" type="attribute" required="false" entityProperty="cellEntity">
                     <caption>值</caption>
                     <description></description>
                     <attributeTypes>

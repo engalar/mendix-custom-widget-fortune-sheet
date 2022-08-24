@@ -13,9 +13,8 @@ import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 import { persistentEntity } from "./persistent/entity";
 import { redraw } from "./view/util";
 
-export default function (props: ContainerProps) {
+export default function(props: ContainerProps) {
     const [errorMsg, setErrorMsg] = useState<string>();
-    const [modifiedCellSet] = useState(new Set<string>());
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
     const [inViewport] = useInViewport(refContainer);
@@ -31,7 +30,7 @@ export default function (props: ContainerProps) {
 
     useEffect(() => {
         store.updateMxOption(props);
-        return () => { };
+        return () => {};
     }, [store, props]);
 
     useUnmount(() => {
@@ -40,7 +39,10 @@ export default function (props: ContainerProps) {
 
     useEffect(() => {
         // one time check
-        if (props.assoChange !== "" && props.cellEntity !== getReferencePart(props.assoChange, "entity")) {
+        if (
+            props.assoChange !== "" &&
+            getReferencePart(props.cellEntity, "entity") !== getReferencePart(props.assoChange, "entity")
+        ) {
             const msg = `组件【${props.uniqueid}】: 实体【单元格->数据实体】 必须与 实体【事件->保存->关联】 一致`;
             mx.logger.error(msg);
             setErrorMsg(msg);
@@ -80,9 +82,9 @@ export default function (props: ContainerProps) {
                         () => {
                             mx.ui.hideProgress(h);
                             success();
-                            modifiedCellSet.forEach(d => {
+                            store.modifiedCellSet.forEach(d => {
                                 if (!ignoreSet.has(d)) {
-                                    modifiedCellSet.delete(d);
+                                    store.modifiedCellSet.delete(d);
                                 }
                             });
                         },
@@ -94,14 +96,21 @@ export default function (props: ContainerProps) {
                 })
                 .catch(error);
 
-            // todo save entity data
-            const modifiedGuids = Array.from(modifiedCellSet.keys())
+            const modifiedGuids = Array.from(store.modifiedCellSet.keys())
                 .filter(d => store.m.has(d))
                 .map(d => {
                     const index = store.m.get(d);
-                    // todo create new entity to dumy it/ reuse old one
-                    return store.cellValues[index!].guid;
+                    const cellModel = store.cellValues[index!];
+                    if (index && store.objs) {
+                        // fix hard code sheet index
+                        const newCellValue = ref.current?.getCellValue(cellModel.RowIdx - 1, cellModel.ColIdx - 1, {
+                            index: 0
+                        });
+                        store.objs[index].set(getReferencePart(props.value, "referenceAttr"), newCellValue);
+                    }
+                    return cellModel.guid;
                 });
+
             persistentEntity(modifiedGuids, props.saveEntity, props.assoChange, props.saveMF, props.mxform);
         });
 
@@ -113,11 +122,18 @@ export default function (props: ContainerProps) {
     }, []);
 
     const onOp = useCallback((op: Op[]) => {
-        op.forEach(d => {
-            if (d.path.length === 3 && d.value?.v) {
-                modifiedCellSet.add(`${Number(d.path[1]) + 1}-${Number(d.path[2]) + 1}`);
-            }
-        });
+        if (store.loaded) {
+            // 人工修改
+            op.forEach(d => {
+                store.modifiedCellSet.add(`${Number(d.path[1]) + 1}-${Number(d.path[2]) + 1}`);
+            });
+        } else {
+            // 程序修改
+            setTimeout(() => {
+                store.modifiedCellSet.clear();
+                store.loaded = true;
+            }, 100);
+        }
     }, []);
 
     return (
@@ -125,15 +141,19 @@ export default function (props: ContainerProps) {
             ref={refContainer}
             className={classNames("mendixcn-fortune-sheet", props.class)}
             style={parseStyle(props.style)}
-        >{errorMsg ? <span className="alert-danger">{errorMsg}</span>
-            : <Workbook
-                ref={ref}
-                showFormulaBar={!props.readOnly}
-                allowEdit={true}
-                onOp={onOp}
-                showToolbar={!props.readOnly}
-                data={[data]}
-            />}
+        >
+            {errorMsg ? (
+                <span className="alert-danger">{errorMsg}</span>
+            ) : (
+                <Workbook
+                    ref={ref}
+                    showFormulaBar={!props.readOnly}
+                    allowEdit={true}
+                    onOp={onOp}
+                    showToolbar={!props.readOnly}
+                    data={[data]}
+                />
+            )}
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import { action, computed, configure, flow, makeObservable, observable, when } from "mobx";
 import { ContainerProps } from "../../typings/Props";
-import { entityIsFileDocument, getReferencePart } from "@jeltemx/mendix-react-widget-utils";
+import { entityIsFileDocument } from "@jeltemx/mendix-react-widget-utils";
 import { fetchEntityOverPath } from "./util";
 import { fetchEntitysOverPath } from "../mendix/fetchEntitysOverPath";
 import { ModifiedStore } from "./ModifiedStore";
@@ -16,12 +16,15 @@ export interface CellValue {
 }
 
 export class Store {
+    loaded = true;
     cellValues: CellValue[] = [];
     tplObjGuid?: string;
     tplUrl?: string;
     sub?: mx.Subscription;
     disposer: any;
     modifiedStore: ModifiedStore;
+    objs?: mendix.lib.MxObject[];
+    modifiedCellSet = new Set<string>();
     get m() {
         const map = new Map<string, number>();
         this.cellValues.forEach((v, i) => {
@@ -41,6 +44,7 @@ export class Store {
             mxOption: observable,
             cellValues: observable,
             tplObjGuid: observable,
+            objs: observable,
             tplUrl: observable,
             updateMxOption: action,
             m: computed
@@ -62,6 +66,7 @@ export class Store {
     }
 
     async update() {
+        this.loaded = false;
         await this.loadTemplateExcel();
 
         await this.loadCellValue();
@@ -79,13 +84,11 @@ export class Store {
         this: Store
     ): Generator<Promise<mendix.lib.MxObject[]>, void, mendix.lib.MxObject[]> {
         if (this.mxOption.mxObject) {
-            const objs = yield fetchEntitysOverPath<mendix.lib.MxObject[]>(
+            this.objs = yield fetchEntitysOverPath<mendix.lib.MxObject[]>(
                 this.mxOption.mxObject,
-                getReferencePart(this.mxOption.rowIndex, "referenceAttr") +
-                    "/" +
-                    getReferencePart(this.mxOption.rowIndex, "entity")
+                this.mxOption.cellEntity
             );
-            this.cellValues = objs.map<CellValue>(obj => ({
+            this.cellValues = this.objs.map<CellValue>(obj => ({
                 RowIdx: Number(obj.get(this.mxOption.rowIndex.split("/").slice(-1)[0])),
                 ColIdx: Number(obj.get(this.mxOption.colIndex.split("/").slice(-1)[0])),
                 Value: obj.get(this.mxOption.value.split("/").slice(-1)[0]) as string,
