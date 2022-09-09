@@ -15,6 +15,48 @@ export interface CellValue {
     guid: string;
 }
 
+function name2value(name: string) {
+    let result = 0;
+    switch (name) {
+        case "Null":
+            result = 0;
+            break;
+        case "Merge":
+            result = 1;
+            break;
+        case "Number":
+            result = 2;
+            break;
+        case "String":
+            result = 3;
+            break;
+        case "Date":
+            result = 4;
+            break;
+        case "Hyperlink":
+            result = 5;
+            break;
+        case "Formula":
+            result = 6;
+            break;
+        case "SharedString":
+            result = 7;
+            break;
+        case "RichText":
+            result = 8;
+            break;
+        case "Boolean":
+            result = 9;
+            break;
+        case "Error":
+            result = 10;
+            break;
+        default:
+            throw new Error("值非法");
+    }
+    return result;
+}
+
 export class Store {
     loaded = true;
     cellValues: CellValue[] = [];
@@ -92,7 +134,9 @@ export class Store {
                 RowIdx: Number(obj.get(this.mxOption.rowIndex.split("/").slice(-1)[0])),
                 ColIdx: Number(obj.get(this.mxOption.colIndex.split("/").slice(-1)[0])),
                 Value: obj.get(this.mxOption.value.split("/").slice(-1)[0]) as string,
-                ValueType: Number(obj.get(this.mxOption.valueType.split("/").slice(-1)[0])),
+                ValueType: Number(
+                    name2value((obj.get(this.mxOption.valueType.split("/").slice(-1)[0]) as string).replaceAll("_", ""))
+                ),
                 guid: obj.getGuid()
             }));
         }

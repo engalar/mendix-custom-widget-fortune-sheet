@@ -36,7 +36,7 @@
                     <caption>值类型</caption>
                     <description></description>
                     <attributeTypes>
-                        <attributeType name="Integer" />
+                        <attributeType name="Enum" />
                     </attributeTypes>
                 </property>
                 <property key="value" type="attribute" required="false" entityProperty="cellEntity">

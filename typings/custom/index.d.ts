@@ -40,3 +40,7 @@ declare namespace mxui {
         }
     }
 }
+
+interface String {
+    replaceAll(input: string, output : string): any;
+}
