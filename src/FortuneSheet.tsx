@@ -1,6 +1,6 @@
 import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
-import { Op } from "@fortune-sheet/core";
+import { Op, defaultContext } from "@fortune-sheet/core";
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
 import classNames from "classnames";
@@ -13,7 +13,8 @@ import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
 import { persistentEntity } from "./persistent/entity";
 import { redraw } from "./view/util";
 
-export default function(props: ContainerProps) {
+export default function (props: ContainerProps) {
+    const [context] = useState(defaultContext());
     const [errorMsg, setErrorMsg] = useState<string>();
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
@@ -30,7 +31,7 @@ export default function(props: ContainerProps) {
 
     useEffect(() => {
         store.updateMxOption(props);
-        return () => {};
+        return () => { };
     }, [store, props]);
 
     useUnmount(() => {
@@ -58,7 +59,7 @@ export default function(props: ContainerProps) {
 
         const disp2 = autorun(async () => {
             if (store.tplUrl) {
-                await loadExcelTemplate(ref, store.tplUrl);
+                await loadExcelTemplate(store.tplUrl, context);
             }
         });
 
