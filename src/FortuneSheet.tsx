@@ -1,12 +1,11 @@
 import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
-import { Op, defaultContext } from "@fortune-sheet/core";
+import { Op } from "@fortune-sheet/core";
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
 import classNames from "classnames";
 import { Store } from "./store";
 import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks";
-import data from "./data/empty";
 import { autorun } from "mobx";
 import { loadExcelTemplate, writeToFile } from "./store/util";
 import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
@@ -14,7 +13,7 @@ import { persistentEntity } from "./persistent/entity";
 import { redraw } from "./view/util";
 
 export default function (props: ContainerProps) {
-    const [context] = useState(defaultContext());
+    const [data, setData] = useState<any>(undefined);
     const [errorMsg, setErrorMsg] = useState<string>();
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
@@ -59,7 +58,8 @@ export default function (props: ContainerProps) {
 
         const disp2 = autorun(async () => {
             if (store.tplUrl) {
-                await loadExcelTemplate(store.tplUrl, context);
+                const tpl = await loadExcelTemplate(store.tplUrl);
+                setData(tpl);
             }
         });
 
@@ -146,14 +146,15 @@ export default function (props: ContainerProps) {
             {errorMsg ? (
                 <span className="alert-danger">{errorMsg}</span>
             ) : (
-                <Workbook
-                    ref={ref}
-                    showFormulaBar={!props.readOnly}
-                    allowEdit={true}
-                    onOp={onOp}
-                    showToolbar={!props.readOnly}
-                    data={[data]}
-                />
+                data ?
+                    <Workbook
+                        ref={ref}
+                        showFormulaBar={!props.readOnly}
+                        allowEdit={true}
+                        onOp={onOp}
+                        showToolbar={!props.readOnly}
+                        data={data}
+                    /> : undefined
             )}
         </div>
     );

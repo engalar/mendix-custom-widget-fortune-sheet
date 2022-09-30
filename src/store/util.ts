@@ -1,8 +1,7 @@
 import { Workbook } from "exceljs";
 import { getObject } from "@jeltemx/mendix-react-widget-utils";
 
-import { Context, Sheet } from "@fortune-sheet/core";
-import { redraw } from "../view/util";
+import { Sheet } from "@fortune-sheet/core";
 import LuckyExcel from "luckyexcel";
 const parse = require("color-parse");
 
@@ -118,7 +117,7 @@ export async function writeToFile(sheets: Sheet[], ignoreSet: Set<string>) {
     return await wb.xlsx.writeBuffer();
 }
 
-export async function loadExcelTemplate(url: string, context: Context) {
+export async function loadExcelTemplate(url: string) {
     const h = mx.ui.showProgress("加载模板。。。", true);
     const res = await fetch(url);
     const data = await res.arrayBuffer();
@@ -132,9 +131,9 @@ export async function loadExcelTemplate(url: string, context: Context) {
         );
     });
 
-    context.luckysheetfile = exportJson.sheets;
-    redraw();
     mx.ui.hideProgress(h);
+    // redraw();
+    return exportJson.sheets;
 }
 
 export async function fetchEntityOverPath(obj: mendix.lib.MxObject, attr = ""): Promise<mendix.lib.MxObject | null> {
