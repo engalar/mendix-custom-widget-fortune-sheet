@@ -42,5 +42,9 @@ declare namespace mxui {
 }
 
 interface String {
-    replaceAll(input: string, output : string): any;
+    replaceAll(input: string, output: string): any;
+}
+
+declare module "luckyexcel" {
+   declare function transformExcelToLucky(data: any, resolve: any, reject: any);
 }

@@ -4,8 +4,20 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd">
     <name>FortuneSheet</name>
     <description>FortuneSheet for Mendix</description>
+    <helpUrl>https://github.com/engalar/mendix-custom-widget-fortune-sheet/blob/master/README.md</helpUrl>
     <icon></icon>
     <properties>
+        <propertyGroup caption="文档">
+            <property key="helpUrl" type="string" required="false" defaultValue="https://github.com/engalar/mendix-custom-widget-fortune-sheet" multiline="false">
+                <caption>文档地址</caption>
+                <description></description>
+            </property>
+            <property key="helpUrl2" type="string" required="false" defaultValue="https://github.com/engalar/mendix-custom-widget-fortune-sheet/issues/new" multiline="false">
+                <caption>问题反馈地址</caption>
+                <description></description>
+            </property>
+        </propertyGroup>
+
         <propertyGroup caption="通用">
             <propertyGroup caption="模板文件">
                 <property key="templateEntity" allowNonPersistableEntities="true" type="entity" required="false" isPath="yes" pathType="reference">
@@ -83,7 +95,7 @@
             </propertyGroup>
         </propertyGroup>
 
-        <propertyGroup caption="事件">
+        <!-- <propertyGroup caption="事件">
             <propertyGroup caption="保存">
                 <property key="saveEntity" type="entity" required="false" allowNonPersistableEntities="true">
                     <caption>保存上下文实体</caption>
@@ -99,7 +111,7 @@
                     <returnType type="Void" />
                 </property>
             </propertyGroup>
-        </propertyGroup>
+        </propertyGroup> -->
 
     </properties>
 </widget>

@@ -6,15 +6,13 @@ import "./ui/index.scss";
 import classNames from "classnames";
 import { Store } from "./store";
 import { useUnmount, useInViewport, usePrevious, useUpdateEffect } from "ahooks";
-import data from "./data/empty";
 import { autorun } from "mobx";
-import { loadExcelTemplate, writeToFile } from "./store/util";
-import { getReferencePart } from "@jeltemx/mendix-react-widget-utils";
-import { persistentEntity } from "./persistent/entity";
+import { loadExcelTemplate } from "./store/util";
 import { redraw } from "./view/util";
 
-export default function(props: ContainerProps) {
-    const [errorMsg, setErrorMsg] = useState<string>();
+export default function (props: ContainerProps) {
+    const [data, setData] = useState<any>(undefined);
+    const [errorMsg] = useState<string>();
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
     const [inViewport] = useInViewport(refContainer);
@@ -30,7 +28,7 @@ export default function(props: ContainerProps) {
 
     useEffect(() => {
         store.updateMxOption(props);
-        return () => {};
+        return () => { };
     }, [store, props]);
 
     useUnmount(() => {
@@ -38,86 +36,36 @@ export default function(props: ContainerProps) {
     });
 
     useEffect(() => {
-        // one time check
-        if (
+        // widget api check
+        /* if (
             props.assoChange !== "" &&
             getReferencePart(props.cellEntity, "entity") !== getReferencePart(props.assoChange, "entity")
         ) {
             const msg = `组件【${props.uniqueid}】: 实体【单元格->数据实体】 必须与 实体【事件->保存->关联】 一致`;
             mx.logger.error(msg);
             setErrorMsg(msg);
-        }
-
-        const disp1 = autorun(async () => {
-            store.cellValues.forEach(cell => {
-                ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
-                    type: cell.ValueType === 3 ? "v" : "f"
-                });
-            });
-        });
+        } */
 
         const disp2 = autorun(async () => {
+            // load teplate once tplUrl changed
             if (store.tplUrl) {
-                await loadExcelTemplate(ref, store.tplUrl);
+                const tpl = await loadExcelTemplate(store.tplUrl);
+                setData(tpl);
+
+
             }
-        });
-
-        const disp3 = ((props.mxform as unknown) as mxui.lib.form.ContentForm).listen("submit", (success, error) => {
-            const sheets = ref.current!.getAllSheets();
-            const h = mx.ui.showProgress("保存模板。。。", true);
-
-            const ignoreSet = new Set<string>();
-            store.cellValues.forEach(d => {
-                ignoreSet.add(d.RowIdx + "-" + d.ColIdx);
-            });
-            writeToFile(sheets, ignoreSet)
-                .then(buffer => {
-                    mx.data.saveDocument(
-                        store.tplObjGuid!,
-                        "demo" + new Date().getTime() + ".xlsx",
-                        {},
-                        new Blob([new Uint8Array(buffer, 0, buffer.byteLength)], {
-                            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                        }),
-                        () => {
-                            mx.ui.hideProgress(h);
-                            success();
-                            store.modifiedCellSet.forEach(d => {
-                                if (!ignoreSet.has(d)) {
-                                    store.modifiedCellSet.delete(d);
-                                }
-                            });
-                        },
-                        err => {
-                            mx.ui.hideProgress(h);
-                            error(err);
-                        }
-                    );
-                })
-                .catch(error);
-
-            const modifiedGuids = Array.from(store.modifiedCellSet.keys())
-                .filter(d => store.m.has(d))
-                .map(d => {
-                    const index = store.m.get(d);
-                    const cellModel = store.cellValues[index!];
-                    if (index && store.objs) {
-                        // fix hard code sheet index
-                        const newCellValue = ref.current?.getCellValue(cellModel.RowIdx - 1, cellModel.ColIdx - 1, {
-                            index: 0
-                        });
-                        store.objs[index].set(getReferencePart(props.value, "referenceAttr"), newCellValue);
-                    }
-                    return cellModel.guid;
+            // update model to view in next tick
+            setTimeout(() => {
+                store.cellValues.forEach(cell => {
+                    ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
+                        type: cell.ValueType === 3 ? "v" : "f"
+                    });
                 });
-
-            persistentEntity(modifiedGuids, props.saveEntity, props.assoChange, props.saveMF, props.mxform);
+            }, 0);
         });
 
         return () => {
-            disp1();
             disp2();
-            disp3();
         };
     }, []);
 
@@ -145,14 +93,15 @@ export default function(props: ContainerProps) {
             {errorMsg ? (
                 <span className="alert-danger">{errorMsg}</span>
             ) : (
-                <Workbook
-                    ref={ref}
-                    showFormulaBar={!props.readOnly}
-                    allowEdit={true}
-                    onOp={onOp}
-                    showToolbar={!props.readOnly}
-                    data={[data]}
-                />
+                data ?
+                    <Workbook
+                        ref={ref}
+                        showFormulaBar={!props.readOnly}
+                        allowEdit={!props.readOnly}
+                        onOp={onOp}
+                        showToolbar={!props.readOnly}
+                        data={data}
+                    /> : undefined
             )}
         </div>
     );

@@ -1,7 +1,7 @@
 {
   "name": "fortunesheet",
   "widgetName": "FortuneSheet",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Template repo for legacy custome wiget",
   "copyright": "2021 Mendix",
   "author": "Liu Wengao <wengao.liu@siemens.com>",
@@ -73,6 +73,7 @@
     "core-js": "2.6.5",
     "exceljs": "^4.3.0",
     "mobx": "^6.3.10",
-    "mobx-react": "^7.2.1"
+    "mobx-react": "^7.2.1",
+    "luckyexcel": "^1.0.1"
   }
 }

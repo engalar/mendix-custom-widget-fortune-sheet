@@ -1,9 +1,8 @@
-import { WorkbookInstance } from "@fortune-sheet/react";
-import { RefObject } from "react";
-import { ValueType, Workbook } from "exceljs";
+import { Workbook } from "exceljs";
 import { getObject } from "@jeltemx/mendix-react-widget-utils";
+
 import { Sheet } from "@fortune-sheet/core";
-import { redraw } from "../view/util";
+import LuckyExcel from "luckyexcel";
 const parse = require("color-parse");
 
 function p(n: number) {
@@ -118,63 +117,23 @@ export async function writeToFile(sheets: Sheet[], ignoreSet: Set<string>) {
     return await wb.xlsx.writeBuffer();
 }
 
-export async function loadExcelTemplate(ref: RefObject<WorkbookInstance>, url: string) {
+export async function loadExcelTemplate(url: string) {
     const h = mx.ui.showProgress("加载模板。。。", true);
     const res = await fetch(url);
     const data = await res.arrayBuffer();
-    const wbInstance = await new Workbook().xlsx.load(data);
-
-    //todo hard code
-    wbInstance.worksheets[0].eachRow(row => {
-        row.eachCell(cell => {
-            if (cell.type !== ValueType.Merge) {
-                ref.current?.setCellValue(Number(cell.row) - 1, Number(cell.col) - 1, cell.value, {
-                    type: cell.formula ? "f" : "v"
-                });
-
-                if (cell.isMerged) {
-                    //@ts-ignore:next-line
-                    const range = wbInstance.worksheets[0]._merges[cell.address].model;
-                    // wbInstance.worksheets[0].mergeCells(range.top, range.left, range.bottom, range.right);
-                    //https://github.com/ruilisi/fortune-sheet/blob/76a66b9c0ba5125397313494db0798f560d70fbf/packages/core/test/api/merge.test.js
-                    ref.current?.mergeCells(
-                        [{ column: [range.left - 1, range.right - 1], row: [range.top - 1, range.bottom - 1] }],
-                        "merge-all"
-                    );
-                }
-
-                // style cfg must after merge
-                // 水平对齐
-                let horizontal = undefined;
-                switch (cell.style.alignment?.horizontal) {
-                    case "left":
-                        horizontal = "1";
-                        break;
-                    case "center":
-                        horizontal = "0";
-                        break;
-                    case "right":
-                        horizontal = "2";
-                        break;
-
-                    default:
-                        break;
-                }
-                ref.current?.setCellFormat(Number(cell.row) - 1, Number(cell.col) - 1, "ht", horizontal);
-
-                // bg color
-                let bg = undefined;
-                if (cell.fill && cell.fill.type === "pattern") bg = `#${cell.fill.fgColor}`;
-                if (bg) {
-                    ref.current?.setCellFormat(Number(cell.row) - 1, Number(cell.col) - 1, "bg", bg);
-                }
-            } else {
-                //https://github.com/exceljs/exceljs#merged-cells
-            }
-        });
+    const [exportJson] = await new Promise<any>((resolve, reject) => {
+        LuckyExcel.transformExcelToLucky(
+            data,
+            (a: any, b: any) => {
+                resolve([a, b]);
+            },
+            reject
+        );
     });
-    redraw();
+
     mx.ui.hideProgress(h);
+    // redraw();
+    return exportJson.sheets;
 }
 
 export async function fetchEntityOverPath(obj: mendix.lib.MxObject, attr = ""): Promise<mendix.lib.MxObject | null> {
