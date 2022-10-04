@@ -10,7 +10,7 @@ import { autorun } from "mobx";
 import { loadExcelTemplate } from "./store/util";
 import { redraw } from "./view/util";
 
-export default function (props: ContainerProps) {
+export default function(props: ContainerProps) {
     const [data, setData] = useState<any>(undefined);
     const [errorMsg] = useState<string>();
     const ref = useRef<WorkbookInstance>(null);
@@ -28,7 +28,7 @@ export default function (props: ContainerProps) {
 
     useEffect(() => {
         store.updateMxOption(props);
-        return () => { };
+        return () => {};
     }, [store, props]);
 
     useUnmount(() => {
@@ -51,8 +51,6 @@ export default function (props: ContainerProps) {
             if (store.tplUrl) {
                 const tpl = await loadExcelTemplate(store.tplUrl);
                 setData(tpl);
-
-
             }
             // update model to view in next tick
             setTimeout(() => {
@@ -92,16 +90,17 @@ export default function (props: ContainerProps) {
         >
             {errorMsg ? (
                 <span className="alert-danger">{errorMsg}</span>
+            ) : data ? (
+                <Workbook
+                    ref={ref}
+                    showFormulaBar={!props.readOnly}
+                    allowEdit={!props.readOnly}
+                    onOp={onOp}
+                    showToolbar={!props.readOnly}
+                    data={data}
+                />
             ) : (
-                data ?
-                    <Workbook
-                        ref={ref}
-                        showFormulaBar={!props.readOnly}
-                        allowEdit={!props.readOnly}
-                        onOp={onOp}
-                        showToolbar={!props.readOnly}
-                        data={data}
-                    /> : undefined
+                undefined
             )}
         </div>
     );

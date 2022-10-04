@@ -28,7 +28,7 @@ jobs:
                   submodules: true
             - uses: actions/setup-node@v3
               with:
-                  node-version: 14
+                  node-version: 16
                   cache: "npm"
             - name: Get package info
               id: package
