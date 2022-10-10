@@ -1,10 +1,5 @@
-# todo
+![image](https://user-images.githubusercontent.com/2411314/194795464-3a51f1fb-6986-4b79-bc1b-16c05d093388.png)
 
--   [ ] enable commit btn
--   [ ] collect change cell
--   [ ] pass para
-
-![demo](img/demo.png)
 
 # 重命名
 
