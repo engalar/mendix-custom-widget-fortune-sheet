@@ -17,7 +17,7 @@ type VisibilityMap = {
 };
 
 export function getVisibleProperties(props: ContainerProps, visibilityMap: VisibilityMap): VisibilityMap {
-    visibilityMap.assoChange = props.saveEntity !== "";
-    visibilityMap.saveMF = props.assoChange !== "" && props.saveEntity !== "";
+    console.log(props);
+    
     return visibilityMap;
 }

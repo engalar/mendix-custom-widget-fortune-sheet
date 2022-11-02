@@ -4,58 +4,10 @@ import { entityIsFileDocument } from "@jeltemx/mendix-react-widget-utils";
 import { fetchEntityOverPath } from "./util";
 import { fetchEntitysOverPath } from "../mendix/fetchEntitysOverPath";
 import { ModifiedStore } from "./ModifiedStore";
+import { CellValue } from "./objects/CellValue";
 
 configure({ enforceActions: "observed", isolateGlobalState: true, useProxies: "never" });
 
-export interface CellValue {
-    RowIdx: number;
-    ColIdx: number;
-    ValueType: number;
-    Value: string;
-    guid: string;
-}
-
-function name2value(name: string) {
-    let result = 0;
-    switch (name) {
-        case "Null":
-            result = 0;
-            break;
-        case "Merge":
-            result = 1;
-            break;
-        case "Number":
-            result = 2;
-            break;
-        case "String":
-            result = 3;
-            break;
-        case "Date":
-            result = 4;
-            break;
-        case "Hyperlink":
-            result = 5;
-            break;
-        case "Formula":
-            result = 6;
-            break;
-        case "SharedString":
-            result = 7;
-            break;
-        case "RichText":
-            result = 8;
-            break;
-        case "Boolean":
-            result = 9;
-            break;
-        case "Error":
-            result = 10;
-            break;
-        default:
-            throw new Error("值非法");
-    }
-    return result;
-}
 
 export class Store {
     loaded = true;
@@ -130,15 +82,16 @@ export class Store {
                 this.mxOption.mxObject,
                 this.mxOption.cellEntity
             );
-            this.cellValues = this.objs.map<CellValue>(obj => ({
-                RowIdx: Number(obj.get(this.mxOption.rowIndex.split("/").slice(-1)[0])),
-                ColIdx: Number(obj.get(this.mxOption.colIndex.split("/").slice(-1)[0])),
-                Value: obj.get(this.mxOption.value.split("/").slice(-1)[0]) as string,
-                ValueType: Number(
-                    name2value((obj.get(this.mxOption.valueType.split("/").slice(-1)[0]) as string).replaceAll("_", ""))
-                ),
-                guid: obj.getGuid()
-            }));
+            this.cellValues = this.objs.map<CellValue>(
+                obj =>
+                    new CellValue(
+                        obj.getGuid(),
+                        this.mxOption.rowIndex,
+                        this.mxOption.colIndex,
+                        this.mxOption.value,
+                        this.mxOption.valueType
+                    )
+            );
         }
     });
 

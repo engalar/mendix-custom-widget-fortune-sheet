@@ -21,8 +21,7 @@ interface CommonProps {
 
 interface _W {
     assoChange: string;
-    saveMF: string;
-    saveEntity: string;
+    mfEdit: string;
     templateEntity: string;
     top: string;
     bottom: string;
