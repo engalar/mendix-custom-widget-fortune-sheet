@@ -8,7 +8,6 @@ import { CellValue } from "./objects/CellValue";
 
 configure({ enforceActions: "observed", isolateGlobalState: true, useProxies: "never" });
 
-
 export class Store {
     loaded = true;
     cellValues: CellValue[] = [];
@@ -82,8 +81,9 @@ export class Store {
                 this.mxOption.mxObject,
                 this.mxOption.cellEntity
             );
-            this.cellValues = this.objs.map<CellValue>(
-                obj =>
+
+            this.objs.forEach(obj => {
+                this.cellValues.push(
                     new CellValue(
                         obj.getGuid(),
                         this.mxOption.rowIndex,
@@ -91,7 +91,8 @@ export class Store {
                         this.mxOption.value,
                         this.mxOption.valueType
                     )
-            );
+                );
+            });
         }
     });
 

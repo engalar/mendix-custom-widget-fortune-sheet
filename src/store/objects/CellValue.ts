@@ -1,4 +1,4 @@
-import { makeObservable, observable } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 import { BaseMxObject } from "./BaseMxObject";
 
 function name2value(name: string) {
@@ -65,7 +65,8 @@ export class CellValue extends BaseMxObject {
             RowIdx: observable,
             ColIdx: observable,
             ValueType: observable,
-            Value: observable
+            Value: observable,
+            update: action.bound
         });
         this.update();
         this.onChange = () => {
