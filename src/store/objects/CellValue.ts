@@ -58,7 +58,8 @@ export class CellValue extends BaseMxObject {
         private rowIndex: string,
         private colIndex: string,
         private value: string,
-        private valueType: string
+        private valueType: string,
+        private ref: any
     ) {
         super(guid);
         makeObservable(this, {
@@ -81,6 +82,11 @@ export class CellValue extends BaseMxObject {
             this.ValueType = Number(
                 name2value((this.mxObject.get(this.valueType.split("/").slice(-1)[0]) as string).replaceAll("_", ""))
             );
+
+            const cell = this;
+            this.ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
+                type: cell.ValueType === 3 ? "v" : "f"
+            });
         }
     }
 }

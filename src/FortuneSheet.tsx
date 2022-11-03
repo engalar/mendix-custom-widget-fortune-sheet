@@ -6,7 +6,7 @@ import "./ui/index.scss";
 import classNames from "classnames";
 import { Store } from "./store";
 import { useUnmount, useInViewport, usePrevious, useUpdateEffect, useEventListener } from "ahooks";
-import { autorun, reaction, when } from "mobx";
+import { autorun, reaction } from "mobx";
 import { loadExcelTemplate } from "./store/util";
 import { redraw } from "./view/util";
 import { executeMicroflow, getObjectContextFromObjects } from "@jeltemx/mendix-react-widget-utils";
@@ -25,7 +25,7 @@ export default function (props: ContainerProps) {
         }
     }, [inViewport]);
 
-    const store = useMemo(() => new Store(props), []);
+    const store = useMemo(() => new Store(props, ref), []);
 
     useEffect(() => {
         store.updateMxOption(props);

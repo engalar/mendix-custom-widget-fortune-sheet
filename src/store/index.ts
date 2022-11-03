@@ -32,7 +32,7 @@ export class Store {
         this.disposer();
     }
 
-    constructor(public mxOption: ContainerProps) {
+    constructor(public mxOption: ContainerProps, private ref: any) {
         makeObservable(this, {
             mxOption: observable,
             cellValues: observable,
@@ -89,7 +89,7 @@ export class Store {
                         this.mxOption.rowIndex,
                         this.mxOption.colIndex,
                         this.mxOption.value,
-                        this.mxOption.valueType
+                        this.mxOption.valueType, this.ref
                     )
                 );
             });
