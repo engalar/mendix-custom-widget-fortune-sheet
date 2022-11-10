@@ -1,6 +1,6 @@
 import { getObject } from "@jeltemx/mendix-react-widget-utils";
 import LuckyExcel from "luckyexcel";
-
+import { Sheet } from "@fortune-sheet/core";
 
 export async function loadExcelTemplate(url: string) {
     const h = mx.ui.showProgress("加载模板。。。", true);
@@ -17,8 +17,7 @@ export async function loadExcelTemplate(url: string) {
     });
 
     mx.ui.hideProgress(h);
-    // redraw();
-    return exportJson.sheets;
+    return exportJson.sheets as Sheet[];
 }
 
 export async function fetchEntityOverPath(obj: mendix.lib.MxObject, attr = ""): Promise<mendix.lib.MxObject | null> {

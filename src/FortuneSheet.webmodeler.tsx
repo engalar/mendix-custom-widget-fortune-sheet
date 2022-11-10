@@ -18,6 +18,6 @@ type VisibilityMap = {
 
 export function getVisibleProperties(props: ContainerProps, visibilityMap: VisibilityMap): VisibilityMap {
     console.log(props);
-    
+
     return visibilityMap;
 }

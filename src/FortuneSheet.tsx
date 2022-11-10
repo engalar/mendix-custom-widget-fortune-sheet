@@ -1,18 +1,18 @@
-import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createElement, useEffect, useMemo, useRef, useState } from "react";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
-import { Op } from "@fortune-sheet/core";
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
 import classNames from "classnames";
 import { Store } from "./store";
 import { useUnmount, useInViewport, usePrevious, useUpdateEffect, useEventListener } from "ahooks";
-import { autorun, reaction } from "mobx";
+import { autorun, reaction, toJS } from "mobx";
 import { loadExcelTemplate } from "./store/util";
 import { redraw } from "./view/util";
 import { executeMicroflow, getObjectContextFromObjects } from "@jeltemx/mendix-react-widget-utils";
+import { Sheet } from "@fortune-sheet/core";
 
-export default function (props: ContainerProps) {
-    const [data, setData] = useState<any>(undefined);
+export default function(props: ContainerProps) {
+    const [data, setData] = useState<Sheet[] | undefined>(undefined);
     const [errorMsg] = useState<string>();
     const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
@@ -29,7 +29,7 @@ export default function (props: ContainerProps) {
 
     useEffect(() => {
         store.updateMxOption(props);
-        return () => { };
+        return () => {};
     }, [store, props]);
 
     useUnmount(() => {
@@ -51,7 +51,15 @@ export default function (props: ContainerProps) {
             // load teplate once tplUrl changed
             if (store.tplUrl) {
                 const tpl = await loadExcelTemplate(store.tplUrl);
-                setData(tpl);
+
+                //https://github.com/ruilisi/fortune-sheet#migrating-data-from-luckysheet
+                const sheet: any = tpl[0];
+                sheet.id = sheet.index;
+                for (const d of sheet.calcChain) {
+                    d.id = d.index;
+                }
+
+                setData(toJS(tpl));
             }
             // update model to view in next tick
             setTimeout(() => {
@@ -63,13 +71,17 @@ export default function (props: ContainerProps) {
             }, 0);
         });
 
-        const disp3 = reaction(() => store.cellValues, () => {
-            store.cellValues.forEach(cell => {
-                ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
-                    type: cell.ValueType === 3 ? "v" : "f"
+        const disp3 = reaction(
+            () => store.cellValues,
+            () => {
+                store.cellValues.forEach(cell => {
+                    ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
+                        type: cell.ValueType === 3 ? "v" : "f"
+                    });
                 });
-            });
-        });
+            },
+            { fireImmediately: true }
+        );
 
         return () => {
             disp2();
@@ -78,11 +90,18 @@ export default function (props: ContainerProps) {
     }, []);
 
     useEventListener(
-        'dblclick',
+        "dblclick",
         e => {
             if (!props.mfEdit) return;
-            const [{ column: [columnIndex], row: [rowIndex] }] = ref.current!.getSelection()!;
-            const currentCell = store.cellValues.find(cell => cell.RowIdx - 1 == rowIndex && cell.ColIdx - 1 == columnIndex);
+            const [
+                {
+                    column: [columnIndex],
+                    row: [rowIndex]
+                }
+            ] = ref.current!.getSelection()!;
+            const currentCell = store.cellValues.find(
+                cell => cell.RowIdx - 1 == rowIndex && cell.ColIdx - 1 == columnIndex
+            );
 
             if (!currentCell) return;
 
@@ -91,23 +110,8 @@ export default function (props: ContainerProps) {
 
             executeMicroflow(props.mfEdit, getObjectContextFromObjects(obj), props.mxform);
         },
-        { target: refContainer },
+        { target: refContainer }
     );
-
-    const onOp = useCallback((op: Op[]) => {
-        if (store.loaded) {
-            // 人工修改
-            op.forEach(d => {
-                store.modifiedCellSet.add(`${Number(d.path[1]) + 1}-${Number(d.path[2]) + 1}`);
-            });
-        } else {
-            // 程序修改
-            setTimeout(() => {
-                store.modifiedCellSet.clear();
-                store.loaded = true;
-            }, 100);
-        }
-    }, []);
 
     return (
         <div
@@ -122,7 +126,6 @@ export default function (props: ContainerProps) {
                     ref={ref}
                     showFormulaBar={!props.readOnly}
                     allowEdit={!props.readOnly}
-                    onOp={onOp}
                     showToolbar={!props.readOnly}
                     data={data}
                 />

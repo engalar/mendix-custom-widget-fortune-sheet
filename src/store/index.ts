@@ -89,7 +89,8 @@ export class Store {
                         this.mxOption.rowIndex,
                         this.mxOption.colIndex,
                         this.mxOption.value,
-                        this.mxOption.valueType, this.ref
+                        this.mxOption.valueType,
+                        this.ref
                     )
                 );
             });
