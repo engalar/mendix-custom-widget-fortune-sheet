@@ -5,6 +5,7 @@
  */
 import { CSSProperties } from "react";
 import { EditableValue } from "mendix";
+import { INanoflow } from "@jeltemx/mendix-react-widget-utils";
 
 interface CommonProps {
     name: string;
@@ -22,6 +23,8 @@ interface CommonProps {
 interface _W {
     assoChange: string;
     mfEdit: string;
+    mfInlineEdit: string;
+    nfInlineEdit: INanoflow;
     templateEntity: string;
     top: string;
     bottom: string;

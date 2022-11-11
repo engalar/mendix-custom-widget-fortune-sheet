@@ -1,4 +1,4 @@
-import { createElement, useEffect, useMemo, useRef, useState } from "react";
+import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
@@ -8,10 +8,10 @@ import { useUnmount, useInViewport, usePrevious, useUpdateEffect, useEventListen
 import { autorun, reaction, toJS } from "mobx";
 import { loadExcelTemplate } from "./store/util";
 import { redraw } from "./view/util";
-import { executeMicroflow, getObjectContextFromObjects } from "@jeltemx/mendix-react-widget-utils";
-import { Sheet } from "@fortune-sheet/core";
+import { executeMicroflow, executeNanoflow, getObjectContextFromObjects } from "@jeltemx/mendix-react-widget-utils";
+import { Sheet, Op } from "@fortune-sheet/core";
 
-export default function(props: ContainerProps) {
+export default function (props: ContainerProps) {
     const [data, setData] = useState<Sheet[] | undefined>(undefined);
     const [errorMsg] = useState<string>();
     const ref = useRef<WorkbookInstance>(null);
@@ -29,8 +29,42 @@ export default function(props: ContainerProps) {
 
     useEffect(() => {
         store.updateMxOption(props);
-        return () => {};
+        return () => { };
     }, [store, props]);
+
+    const onOp = useCallback((op: Op[]) => {
+        if (store.loaded) {
+            // 人工修改
+            op.forEach(d => {
+                const rowIndex = Number(d.path[1]) + 1;
+                const columnIndex = Number(d.path[2]) + 1;
+                store.modifiedCellSet.add(`${rowIndex}-${columnIndex}`);
+
+                const currentCell = store.cellValues.find(
+                    cell => cell.RowIdx == rowIndex && cell.ColIdx == columnIndex
+                );
+
+                if (currentCell) {
+                    const obj = mx.data.getCachedObject(currentCell!.guid);
+                    obj.set(props.value, d.value);
+
+                    const context = getObjectContextFromObjects(obj);
+
+                    if (props.mfInlineEdit)
+                        executeMicroflow(props.mfInlineEdit, context, props.mxform);
+
+                    if (props.nfInlineEdit.nanoflow)
+                        executeNanoflow(props.nfInlineEdit, context, props.mxform);
+                }
+            });
+        } else {
+            // 程序修改
+            setTimeout(() => {
+                store.modifiedCellSet.clear();
+                store.loaded = true;
+            }, 100);
+        }
+    }, []);
 
     useUnmount(() => {
         store.dispose();
@@ -92,7 +126,7 @@ export default function(props: ContainerProps) {
     useEventListener(
         "dblclick",
         e => {
-            if (!props.mfEdit) return;
+            if (!props.mfEdit || props.nfInlineEdit || props.mfInlineEdit) return;
             const [
                 {
                     column: [columnIndex],
@@ -106,9 +140,10 @@ export default function(props: ContainerProps) {
             if (!currentCell) return;
 
             const obj = mx.data.getCachedObject(currentCell!.guid);
-            e.stopPropagation();
 
             executeMicroflow(props.mfEdit, getObjectContextFromObjects(obj), props.mxform);
+
+            e.stopPropagation();
         },
         { target: refContainer }
     );
@@ -124,6 +159,7 @@ export default function(props: ContainerProps) {
             ) : data ? (
                 <Workbook
                     ref={ref}
+                    onOp={onOp}
                     showFormulaBar={!props.readOnly}
                     allowEdit={!props.readOnly}
                     showToolbar={!props.readOnly}

@@ -102,6 +102,16 @@
                     <description></description>
                     <returnType type="Void" />
                 </property>
+                <property key="mfInlineEdit" type="microflow" required="false" entityProperty="cellEntity">
+                    <caption>直接编辑(Microflow)</caption>
+                    <description></description>
+                    <returnType type="Void" />
+                </property>
+                <property key="nfInlineEdit" type="nanoflow" required="false" entityProperty="cellEntity">
+                    <caption>直接编辑(Nanoflow)</caption>
+                    <description></description>
+                    <returnType type="Void" />
+                </property>
             </propertyGroup>
         </propertyGroup>
 
