@@ -5,4 +5,8 @@
     height: 100%;
     min-height: 500px;
     display: grid;
+
+    .luckysheet-scrollbars.luckysheet-scrollbar-ltr.luckysheet-scrollbar-x {
+        width: calc(100% - 44.5px);
+    }
 }
