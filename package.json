@@ -1,7 +1,7 @@
 {
   "name": "fortunesheet",
   "widgetName": "FortuneSheet",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Template repo for legacy custome wiget",
   "copyright": "2021 Mendix",
   "author": "Liu Wengao <wengao.liu@siemens.com>",

@@ -11,7 +11,7 @@ import { redraw } from "./view/util";
 import { executeMicroflow, executeNanoflow, getObjectContextFromObjects } from "@jeltemx/mendix-react-widget-utils";
 import { Sheet, Op } from "@fortune-sheet/core";
 
-export default function (props: ContainerProps) {
+export default function(props: ContainerProps) {
     const [data, setData] = useState<Sheet[] | undefined>(undefined);
     const [errorMsg] = useState<string>();
     const ref = useRef<WorkbookInstance>(null);
@@ -29,15 +29,18 @@ export default function (props: ContainerProps) {
 
     useEffect(() => {
         store.updateMxOption(props);
-        return () => { };
+        return () => {};
     }, [store, props]);
 
     const onOp = useCallback((op: Op[]) => {
         if (store.loaded) {
             // 人工修改
             op.forEach(d => {
-                const rowIndex = Number(d.path[1]) + 1;
-                const columnIndex = Number(d.path[2]) + 1;
+                const [dd, r, c, t] = d.path;
+                if (t != "v" || dd != "data") return;
+
+                const rowIndex = Number(r) + 1;
+                const columnIndex = Number(c) + 1;
                 store.modifiedCellSet.add(`${rowIndex}-${columnIndex}`);
 
                 const currentCell = store.cellValues.find(
@@ -50,11 +53,9 @@ export default function (props: ContainerProps) {
 
                     const context = getObjectContextFromObjects(obj);
 
-                    if (props.mfInlineEdit)
-                        executeMicroflow(props.mfInlineEdit, context, props.mxform);
+                    if (props.mfInlineEdit) executeMicroflow(props.mfInlineEdit, context, props.mxform);
 
-                    if (props.nfInlineEdit.nanoflow)
-                        executeNanoflow(props.nfInlineEdit, context, props.mxform);
+                    if (props.nfInlineEdit.nanoflow) executeNanoflow(props.nfInlineEdit, context, props.mxform);
                 }
             });
         } else {
@@ -126,7 +127,9 @@ export default function (props: ContainerProps) {
     useEventListener(
         "dblclick",
         e => {
-            if (!props.mfEdit || props.nfInlineEdit || props.mfInlineEdit) return;
+            if (props.mfEdit == "" || props.nfInlineEdit.nanoflow != undefined || props.mfInlineEdit != "") {
+                return;
+            }
             const [
                 {
                     column: [columnIndex],
