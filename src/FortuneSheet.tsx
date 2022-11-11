@@ -1,23 +1,19 @@
-import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Workbook, WorkbookInstance } from "@fortune-sheet/react";
+import { createElement, useEffect, useMemo, useRef, useState } from "react";
 import { ContainerProps } from "../typings/Props";
 import "./ui/index.scss";
 import classNames from "classnames";
-import { Store } from "./store";
-import { useUnmount, useInViewport, usePrevious, useUpdateEffect, useEventListener } from "ahooks";
-import { autorun, reaction, toJS } from "mobx";
-import { loadExcelTemplate } from "./store/util";
+import { useInViewport, usePrevious, useUpdateEffect } from "ahooks";
 import { redraw } from "./view/util";
-import { executeMicroflow, executeNanoflow, getObjectContextFromObjects } from "@jeltemx/mendix-react-widget-utils";
-import { Sheet, Op } from "@fortune-sheet/core";
 
 export default function (props: ContainerProps) {
-    const [data, setData] = useState<Sheet[] | undefined>(undefined);
     const [errorMsg] = useState<string>();
-    const ref = useRef<WorkbookInstance>(null);
     const refContainer = useRef(null);
     const [inViewport] = useInViewport(refContainer);
     const preInViewPort = usePrevious(inViewport);
+
+    //@ts-ignore: next-line
+    const id = useMemo(() => dijit.registry.getUniqueId(props.uniqueid), [])
+
     useUpdateEffect(() => {
         if (inViewport && !preInViewPort) {
             //trick redraw
@@ -25,128 +21,152 @@ export default function (props: ContainerProps) {
         }
     }, [inViewport]);
 
-    const store = useMemo(() => new Store(props, ref), []);
-
     useEffect(() => {
-        store.updateMxOption(props);
-        return () => { };
-    }, [store, props]);
+        //@ts-ignore: next-line
+        setTimeout(function () {
+            var options = {
+                container: id,
+                lang: 'zh', forceCalculation: false,
+                plugins: ['chart'],
+                hook: {
 
-    const onOp = useCallback((op: Op[]) => {
-        if (store.loaded) {
-            // 人工修改
-            op.forEach(d => {
-                const rowIndex = Number(d.path[1]) + 1;
-                const columnIndex = Number(d.path[2]) + 1;
-                store.modifiedCellSet.add(`${rowIndex}-${columnIndex}`);
+                    //@ts-ignore: next-line
+                    cellDragStop: function (cell, postion, sheetFile, ctx, event) {
+                        // console.info(cell, postion, sheetFile, ctx, event);
+                    },
+                    //@ts-ignore: next-line
+                    rowTitleCellRenderBefore: function (rowNum, postion, ctx) {
+                        // console.log(rowNum);
+                    },
+                    //@ts-ignore: next-line
+                    rowTitleCellRenderAfter: function (rowNum, postion, ctx) {
+                        // console.log(ctx);
+                    },
+                    //@ts-ignore: next-line
+                    columnTitleCellRenderBefore: function (columnAbc, postion, ctx) {
+                        // console.log(columnAbc);
+                    },
+                    //@ts-ignore: next-line
+                    columnTitleCellRenderAfter: function (columnAbc, postion, ctx) {
+                        // console.log(postion);
+                    },
+                    //@ts-ignore: next-line
+                    cellRenderBefore: function (cell, postion, sheetFile, ctx) {
+                        // console.log(cell,postion,sheetFile,ctx);
+                    },
+                    //@ts-ignore: next-line
+                    cellRenderAfter: function (cell, postion, sheetFile, ctx) {
+                        // console.log(postion);
+                    },
+                    //@ts-ignore: next-line
+                    cellMousedownBefore: function (cell, postion, sheetFile, ctx) {
+                        // console.log(postion);
+                    },
+                    //@ts-ignore: next-line
+                    cellMousedown: function (cell, postion, sheetFile, ctx) {
+                        // console.log(sheetFile);
+                    },
+                    //@ts-ignore: next-line
+                    sheetMousemove: function (cell, postion, sheetFile, moveState, ctx) {
+                        // console.log(cell,postion,sheetFile,moveState,ctx);
+                    },
+                    //@ts-ignore: next-line
+                    sheetMouseup: function (cell, postion, sheetFile, moveState, ctx) {
+                        // console.log(cell,postion,sheetFile,moveState,ctx);
+                    },
+                    //@ts-ignore: next-line
+                    cellAllRenderBefore: function (data, sheetFile, ctx) {
+                        // console.info(data,sheetFile,ctx)
+                    },
+                    //@ts-ignore: next-line
+                    updated: function (operate) {
+                        // console.info(operate)
+                    },
+                    //@ts-ignore: next-line
+                    cellUpdateBefore: function (r, c, value, isRefresh) {
+                        // console.info('cellUpdateBefore',r,c,value,isRefresh)
+                    },
+                    //@ts-ignore: next-line
+                    cellUpdated: function (r, c, oldValue, newValue, isRefresh) {
+                        // console.info('cellUpdated',r,c,oldValue, newValue, isRefresh)
+                    },
+                    //@ts-ignore: next-line
+                    sheetActivate: function (index, isPivotInitial, isNewSheet) {
+                        // console.info(index, isPivotInitial, isNewSheet)
+                    },
+                    //@ts-ignore: next-line
+                    rangeSelect: function (index, sheet) {
+                        // console.info(index, sheet)
+                    },
+                    //@ts-ignore: next-line
+                    commentInsertBefore: function (r, c) {
+                        // console.info(r, c)
+                    },
+                    //@ts-ignore: next-line
 
-                const currentCell = store.cellValues.find(
-                    cell => cell.RowIdx == rowIndex && cell.ColIdx == columnIndex
-                );
+                    commentInsertAfter: function (r, c, cell) {
+                        // console.info(r, c, cell)
+                    },
+                    //@ts-ignore: next-line
+                    commentDeleteBefore: function (r, c, cell) {
+                        // console.info(r, c, cell)
+                    },
+                    //@ts-ignore: next-line
+                    commentDeleteAfter: function (r, c, cell) {
+                        // console.info(r, c, cell)
+                    },
+                    //@ts-ignore: next-line
+                    commentUpdateBefore: function (r, c, value) {
+                        // console.info(r, c, value)
+                    },
+                    //@ts-ignore: next-line
+                    commentUpdateAfter: function (r, c, oldCell, newCell) {
+                        // console.info(r, c, oldCell, newCell)
+                    },
+                    //@ts-ignore: next-line
+                    cellEditBefore: function (range) {
+                        // console.info(range)
+                    },
+                    //@ts-ignore: next-line
+                    workbookCreateAfter: function (json) {
+                        // console.info(json)
+                    },
+                    //@ts-ignore: next-line
+                    rangePasteBefore: function (range, data) {
+                        // console.info('rangePasteBefore',range,data)
+                        // return false; //Can intercept paste
+                    },
 
-                if (currentCell) {
-                    const obj = mx.data.getCachedObject(currentCell!.guid);
-                    obj.set(props.value, d.value);
 
-                    const context = getObjectContextFromObjects(obj);
-
-                    if (props.mfInlineEdit)
-                        executeMicroflow(props.mfInlineEdit, context, props.mxform);
-
-                    if (props.nfInlineEdit.nanoflow)
-                        executeNanoflow(props.nfInlineEdit, context, props.mxform);
-                }
-            });
-        } else {
-            // 程序修改
-            setTimeout(() => {
-                store.modifiedCellSet.clear();
-                store.loaded = true;
-            }, 100);
-        }
-    }, []);
-
-    useUnmount(() => {
-        store.dispose();
-    });
-
-    useEffect(() => {
-        // widget api check
-        /* if (
-            props.assoChange !== "" &&
-            getReferencePart(props.cellEntity, "entity") !== getReferencePart(props.assoChange, "entity")
-        ) {
-            const msg = `组件【${props.uniqueid}】: 实体【单元格->数据实体】 必须与 实体【事件->保存->关联】 一致`;
-            mx.logger.error(msg);
-            setErrorMsg(msg);
-        } */
-
-        const disp2 = autorun(async () => {
-            // load teplate once tplUrl changed
-            if (store.tplUrl) {
-                const tpl = await loadExcelTemplate(store.tplUrl);
-
-                //https://github.com/ruilisi/fortune-sheet#migrating-data-from-luckysheet
-                const sheet: any = tpl[0];
-                sheet.id = sheet.index;
-                for (const d of sheet.calcChain) {
-                    d.id = d.index;
-                }
-
-                setData(toJS(tpl));
+                },
+                //@ts-ignore: next-line
+                data: [sheetCell, sheetFormula, sheetConditionFormat, sheetSparkline, sheetTable, sheetComment, sheetPivotTableData, sheetPivotTable, sheetChart, sheetPicture, sheetDataVerification]
             }
-            // update model to view in next tick
-            setTimeout(() => {
-                store.cellValues.forEach(cell => {
-                    ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
-                        type: cell.ValueType === 3 ? "v" : "f"
-                    });
-                });
-            }, 0);
-        });
 
-        const disp3 = reaction(
-            () => store.cellValues,
-            () => {
-                store.cellValues.forEach(cell => {
-                    ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
-                        type: cell.ValueType === 3 ? "v" : "f"
-                    });
-                });
-            },
-            { fireImmediately: true }
-        );
+            //@ts-ignore: next-line
+            options.loading = {
+                image: () => {
+                    return `<svg viewBox="25 25 50 50" class="circular">
+					<circle cx="50" cy="50" r="20" fill="none"></circle>
+					</svg>`
+                },
+                imageClass: "loadingAnimation"
+            }
+            //@ts-ignore: next-line
+            options.cellRightClickConfig = {
+                customs: [{
+                    title: 'test',
 
-        return () => {
-            disp2();
-            disp3();
-        };
+                    //@ts-ignore: next-line
+                    onClick: function (clickEvent, event, params) {
+                        console.log('function test click', clickEvent, event, params)
+                    }
+                }]
+            }
+            //@ts-ignore: next-line
+            luckysheet.create(options)
+        }, 2000);
     }, []);
-
-    useEventListener(
-        "dblclick",
-        e => {
-            if (!props.mfEdit || props.nfInlineEdit || props.mfInlineEdit) return;
-            const [
-                {
-                    column: [columnIndex],
-                    row: [rowIndex]
-                }
-            ] = ref.current!.getSelection()!;
-            const currentCell = store.cellValues.find(
-                cell => cell.RowIdx - 1 == rowIndex && cell.ColIdx - 1 == columnIndex
-            );
-
-            if (!currentCell) return;
-
-            const obj = mx.data.getCachedObject(currentCell!.guid);
-
-            executeMicroflow(props.mfEdit, getObjectContextFromObjects(obj), props.mxform);
-
-            e.stopPropagation();
-        },
-        { target: refContainer }
-    );
 
     return (
         <div
@@ -156,18 +176,9 @@ export default function (props: ContainerProps) {
         >
             {errorMsg ? (
                 <span className="alert-danger">{errorMsg}</span>
-            ) : data ? (
-                <Workbook
-                    ref={ref}
-                    onOp={onOp}
-                    showFormulaBar={!props.readOnly}
-                    allowEdit={!props.readOnly}
-                    showToolbar={!props.readOnly}
-                    data={data}
-                />
-            ) : (
-                undefined
-            )}
+            ) : <div
+                id={id}
+            ></div>}
         </div>
     );
 }

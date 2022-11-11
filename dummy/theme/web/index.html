@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Mendix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{themecss}}
+    {{appicons}}
+    {{manifest}}
+    {{startupimages}}
+
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetFormula.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetCell.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetConditionFormat.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetTable.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetComment.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetPivotTableData.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetPivotTable.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetSparkline.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetChart.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetPicture.js"></script>
+	<script src="https://dream-num.github.io/LuckysheetDemo/demoData/sheetDataVerification.js"></script>
+
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/plugins.css' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/css/luckysheet.css' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/assets/iconfont/iconfont.css' />
+    <script src="https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/js/plugin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/luckysheet.umd.js"></script>
+</head>
+
+<body dir="ltr">
+    <noscript>To use this application, please enable JavaScript.</noscript>
+    <div id="content"></div>
+    <script>
+        dojoConfig = {
+            isDebug: false,
+            useCustomLogger: true,
+            async: true,
+            baseUrl: "mxclientsystem/dojo/",
+            cacheBust: "{{cachebust}}",
+            rtlRedirect: "index-rtl.html"
+        };
+    </script>
+    <script>
+        if (!document.cookie || !document.cookie.match(/(^|;)originURI=/gi))
+            document.cookie = "originURI=/login.html" + (window.location.protocol === "https:" ? ";SameSite=None;Secure" : "");
+    </script>
+    <script src="mxclientsystem/mxui/mxui.js?{{cachebust}}"></script>
+</body>
+
+</html>
