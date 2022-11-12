@@ -11,7 +11,7 @@ import { redraw } from "./view/util";
 import { executeMicroflow, executeNanoflow, getObjectContextFromObjects } from "@jeltemx/mendix-react-widget-utils";
 import { Sheet, Op } from "@fortune-sheet/core";
 
-export default function(props: ContainerProps) {
+export default function (props: ContainerProps) {
     const [data, setData] = useState<Sheet[] | undefined>(undefined);
     const [errorMsg] = useState<string>();
     const ref = useRef<WorkbookInstance>(null);
@@ -29,7 +29,7 @@ export default function(props: ContainerProps) {
 
     useEffect(() => {
         store.updateMxOption(props);
-        return () => {};
+        return () => { };
     }, [store, props]);
 
     const onOp = useCallback((op: Op[]) => {
@@ -98,22 +98,14 @@ export default function(props: ContainerProps) {
             }
             // update model to view in next tick
             setTimeout(() => {
-                store.cellValues.forEach(cell => {
-                    ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
-                        type: cell.ValueType === 3 ? "v" : "f"
-                    });
-                });
+                updateBusinessData();
             }, 0);
         });
 
         const disp3 = reaction(
             () => store.cellValues,
             () => {
-                store.cellValues.forEach(cell => {
-                    ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, cell.Value, {
-                        type: cell.ValueType === 3 ? "v" : "f"
-                    });
-                });
+                updateBusinessData();
             },
             { fireImmediately: true }
         );
@@ -173,6 +165,14 @@ export default function(props: ContainerProps) {
             )}
         </div>
     );
+
+    function updateBusinessData() {
+        store.cellValues.forEach(cell => {
+            ref.current?.setCellValue(Number(cell.RowIdx) - 1, Number(cell.ColIdx) - 1, { v: cell.Value, f: null }, {
+                type: cell.ValueType === 3 ? "v" : "f"
+            });
+        });
+    }
 }
 
 const parseStyle = (style = ""): { [key: string]: string } => {
